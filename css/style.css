@@ -1,0 +1,365 @@
+/* Da Silva Doceria - Sistema de Gestão & PDV */
+/* Paleta de Cores Oficial inspirada na Logotipo */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
+
+:root {
+    /* Cores Oficiais da Logotipo */
+    --logo-pink: #fde8ed;           /* Fundo rosa bebê suave do círculo */
+    --logo-pink-light: #fff5f7;     /* Fundo geral da página */
+    --logo-rose-gold: #c58a80;      /* Friso metálico / Rose gold elegante */
+    --logo-rose-gold-dark: #b17369; /* Tom rose gold escuro para botões */
+    --logo-choco: #2e171e;          /* Chocolate escuro da assinatura 'Da Silva' */
+    --logo-choco-soft: #4a2d36;     /* Chocolate suave para textos secundários */
+    --logo-accent: #e29891;         /* Detalhes de corações e destaques */
+    
+    /* Variáveis do Sistema */
+    --primary: #c57b88;
+    --primary-hover: #b46b78;
+    --primary-light: #fdf2f5;
+    --primary-border: #f0c9d0;
+    --border-card: #f5dde1;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--logo-pink-light);
+    color: var(--logo-choco);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Tipografia de destaque */
+.font-brand {
+    font-family: 'Playfair Display', serif;
+}
+
+/* Custom scrollbars em tom rose gold */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #faedf0;
+}
+::-webkit-scrollbar-thumb {
+    background: #e4bac2;
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #c58a80;
+}
+
+/* Logo Image Styling */
+.brand-logo-img {
+    border: 2px solid var(--logo-rose-gold);
+    box-shadow: 0 4px 14px rgba(197, 138, 128, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.brand-logo-img:hover {
+    transform: scale(1.04) rotate(2deg);
+    box-shadow: 0 6px 18px rgba(197, 138, 128, 0.35);
+}
+
+/* Active navigation item com tom suave da marca */
+.nav-item.active-tab {
+    background: linear-gradient(135deg, #fcecee 0%, #fbdde2 100%);
+    color: #9c4857;
+    font-weight: 700;
+    border-right: 4px solid var(--logo-rose-gold);
+    box-shadow: 0 2px 6px rgba(197, 138, 128, 0.12);
+}
+
+/* Category pills no Catálogo e PDV (Conforme Foto 2) */
+.cat-pill {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #fae1e5;
+    background-color: #ffffff;
+    color: #6d4c54;
+}
+.cat-pill:hover {
+    background-color: #fdf2f4;
+    border-color: #eec2c8;
+    color: #9c4857;
+}
+.cat-pill.active {
+    background: linear-gradient(135deg, #c76e7d 0%, #a95160 100%);
+    color: #ffffff;
+    border-color: #a95160;
+    box-shadow: 0 4px 12px rgba(183, 93, 109, 0.25);
+    font-weight: 700;
+}
+
+/* Product Card no Catálogo (Idêntico ao Screenshot do Usuário) */
+.catalogo-card {
+    background-color: #ffffff;
+    border: 1.5px solid var(--border-card);
+    border-radius: 1.25rem;
+    padding: 1.15rem;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.catalogo-card:hover {
+    transform: translateY(-3px);
+    border-color: #e5a7b1;
+    box-shadow: 0 10px 25px -5px rgba(197, 138, 128, 0.18), 0 8px 10px -6px rgba(197, 138, 128, 0.1);
+}
+
+/* Badges de Categoria dentro do Card */
+.badge-cat-card {
+    background-color: #fdf0f2;
+    color: #ab4e5e;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.65rem;
+    border-radius: 9999px;
+    border: 1px solid #fae2e6;
+}
+
+/* Badge de Preço dentro do Card */
+.badge-preco-card {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #2e171e;
+    background-color: #ffffff;
+    padding: 0.25rem 0.6rem;
+    border-radius: 0.6rem;
+    border: 1px solid #ebd4d8;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+/* Botões de Ação do Card (Editar, Duplicar, Excluir, Adicionar) */
+.btn-card-action {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.65rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    transition: all 0.15s ease;
+    border: 1px solid transparent;
+}
+.btn-card-edit {
+    background-color: #f8fafc;
+    color: #64748b;
+    border-color: #e2e8f0;
+}
+.btn-card-edit:hover {
+    background-color: #fdf2f4;
+    color: #ab4e5e;
+    border-color: #f0c9d0;
+}
+.btn-card-duplicate {
+    background-color: #fdf8ed;
+    color: #b47814;
+    border-color: #faeccf;
+}
+.btn-card-duplicate:hover {
+    background-color: #fbf0d7;
+    color: #8c5b08;
+}
+.btn-card-delete {
+    background-color: #fff1f2;
+    color: #e11d48;
+    border-color: #ffe4e6;
+}
+.btn-card-delete:hover {
+    background-color: #fecdd3;
+    color: #be123c;
+}
+.btn-card-add {
+    background: linear-gradient(135deg, #d88190 0%, #b86070 100%);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(184, 96, 112, 0.3);
+}
+.btn-card-add:hover {
+    background: linear-gradient(135deg, #c76f7e 0%, #a44f5e 100%);
+    transform: scale(1.06);
+}
+
+/* Modais Flutuantes Elegantes & 100% Responsivos no Celular (Sem Cortar Nada) */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background-color: rgba(46, 23, 30, 0.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    transition: opacity 0.2s ease;
+}
+
+.modal-backdrop.hidden {
+    display: none !important;
+}
+
+.modal-card {
+    background-color: #ffffff;
+    border: 1.5px solid #f2d1d7;
+    border-radius: 1.25rem;
+    box-shadow: 0 25px 50px -12px rgba(46, 23, 30, 0.35);
+    animation: modalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    width: 100%;
+    max-height: calc(100dvh - 1.5rem);
+    max-height: calc(100vh - 1.5rem);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin: auto;
+}
+
+@media (min-width: 640px) {
+    .modal-backdrop {
+        padding: 1.5rem;
+    }
+    .modal-card {
+        border-radius: 1.5rem;
+        max-height: calc(100dvh - 3rem);
+        max-height: calc(100vh - 3rem);
+    }
+}
+
+.modal-header {
+    flex-shrink: 0;
+}
+
+.modal-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    min-height: 0;
+    overscroll-behavior: contain;
+}
+
+.modal-footer {
+    flex-shrink: 0;
+}
+
+@keyframes modalPop {
+    from {
+        opacity: 0;
+        transform: scale(0.94) translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Toast Notifications - Adaptado para o celular */
+#toast-container {
+    position: fixed;
+    bottom: 84px;
+    right: 16px;
+    left: 16px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+}
+
+@media (min-width: 768px) {
+    #toast-container {
+        bottom: 24px;
+        right: 24px;
+        left: auto;
+        max-width: 400px;
+    }
+}
+
+.toast {
+    pointer-events: auto;
+    animation: toastSlideIn 0.3s ease forwards;
+    box-shadow: 0 10px 25px -5px rgba(46, 23, 30, 0.2);
+}
+
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Barra de Navegação Inferior para Celular */
+.bottom-nav-btn {
+    transition: all 0.2s ease;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+.bottom-nav-btn:active {
+    transform: scale(0.93);
+}
+.bottom-nav-btn.bottom-nav-active {
+    color: #9c4857 !important;
+    background-color: #fff0f3;
+}
+.bottom-nav-btn.bottom-nav-active i {
+    transform: scale(1.12);
+    color: #c58a80;
+}
+
+/* Rolagem horizontal e vertical suave em containers móveis */
+.touch-scroll-x {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Prevenção de corte e zoom indesejado no iOS Safari ao tocar em inputs */
+@media screen and (max-width: 767px) {
+    input[type="text"],
+    input[type="number"],
+    input[type="tel"],
+    input[type="date"],
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+}
+
+/* Thermal Receipt Print Styles */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #print-cupom-area, #print-cupom-area * {
+        visibility: visible;
+    }
+    #print-cupom-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 80mm;
+        margin: 0;
+        padding: 8px;
+        background: white !important;
+        color: black !important;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 12px;
+    }
+    .no-print {
+        display: none !important;
+    }
+}
