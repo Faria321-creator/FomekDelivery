@@ -1,8 +1,8 @@
 {
   "name": "FOMEK seu app de Delivery",
   "short_name": "FOMEK",
-  "description": "Da Silva Doceria - Peça seus doces favoritos com entrega rápida na sua casa!",
-  "start_url": "./pedido.html",
+  "description": "FOMEK Delivery - Os melhores restaurantes, docerias, hamburguerias e lanches de Lorena na sua casa!",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",

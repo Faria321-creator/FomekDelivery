@@ -1,11 +1,13 @@
 // Service Worker para FOMEK seu app de Delivery
-const CACHE_NAME = 'fomek-cache-v1';
+const CACHE_NAME = 'fomek-cache-v2';
 const ASSETS_TO_CACHE = [
+  './index.html',
   './pedido.html',
   './manifest.json',
   './css/style.css',
   './js/data.js',
   './js/frete.js',
+  './js/asaas.js',
   './js/cloud.js',
   './img/logo.png',
   './img/icon-192.png',

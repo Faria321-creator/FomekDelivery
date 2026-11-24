@@ -439,3 +439,156 @@ const INSUMOS_PADRAO = [
     { id: 15, nome: "Pote Afogadinho 140ml", categoria: "Embalagens", qtd: 100, unidade: "un", custo: 0.50, fornecedor: "Embalagens Cia" }
 ];
 
+// ==========================================
+// MARKETPLACE FOMEK DELIVERY: LOJAS PARCEIRAS
+// ==========================================
+
+const CATEGORIAS_MARKETPLACE = [
+    { id: "todos", nome: "Todas", emoji: "🏬" },
+    { id: "doces", nome: "Doces & Bolos", emoji: "🍰" },
+    { id: "burgers", nome: "Hambúrgueres", emoji: "🍔" },
+    { id: "pizzas", nome: "Pizzas", emoji: "🍕" },
+    { id: "acai", nome: "Açaí & Sorvetes", emoji: "🍦" },
+    { id: "pasteis", nome: "Pastel & Salgados", emoji: "🥐" },
+    { id: "bebidas", nome: "Bebidas", emoji: "🥤" }
+];
+
+const LOJAS_PADRAO = [
+    {
+        id: "dasilva-doceria",
+        nome: "Da Silva Doceria",
+        emoji: "🍰",
+        categoriaPrincipal: "Doces & Sobremesas",
+        categoriaSlug: "doces",
+        logo: "img/logo.png",
+        capa: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=700&auto=format&fit=crop&q=80",
+        avaliacao: 5.0,
+        totalAvaliacoes: 148,
+        tempoEntrega: "30-50 min",
+        distanciaKm: "1.2 km",
+        taxaEntrega: 6.50,
+        taxaEntregaTexto: "R$ 6,50",
+        pedidoMinimo: 20.00,
+        status: "Aberta",
+        whatsapp: "5512999999999",
+        endereco: "Avenida José Moreira Miguel, 733 - Jd. Primavera, Lorena-SP",
+        destaque: "🍓 Copinhos da felicidade, cascões trufados e fatias de brownie artesanais feitos com amor!",
+        destaqueTag: "Mais Pedido da Cidade",
+        destaqueTagCor: "bg-rose-500",
+        categorias: CATEGORIAS_PADRAO,
+        produtos: PRODUTOS_PADRAO
+    },
+    {
+        id: "fomek-burger",
+        nome: "Fomek Burger & Grill",
+        emoji: "🍔",
+        categoriaPrincipal: "Hambúrgueres",
+        categoriaSlug: "burgers",
+        logo: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&auto=format&fit=crop&q=80",
+        capa: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=700&auto=format&fit=crop&q=80",
+        avaliacao: 4.9,
+        totalAvaliacoes: 96,
+        tempoEntrega: "35-50 min",
+        distanciaKm: "2.1 km",
+        taxaEntrega: 7.00,
+        taxaEntregaTexto: "R$ 7,00",
+        pedidoMinimo: 25.00,
+        status: "Aberta",
+        whatsapp: "5512999999999",
+        endereco: "Rua Principal, 250 - Centro, Lorena-SP",
+        destaque: "🍔 Smash burgers suculentos na brasa, queijo cheddar derretido e batatas rústicas com bacon!",
+        destaqueTag: "Super Restaurante",
+        destaqueTagCor: "bg-amber-500",
+        categorias: ["Smash Burgers", "Burgers Especiais", "Combos c/ Batata", "Bebidas"],
+        produtos: [
+            { id: 101, nome: "Smash Fomek Duplo Bacon", categoria: "Smash Burgers", descricao: "2 carnes smash de 90g, cheddar duplo cremoso, fatias crocantes de bacon e maionese defumada da casa.", preco: 32.90, custo: 11.50, icone: "fa-burger" },
+            { id: 102, nome: "Combo Burger Supremo + Fritas + Refri", categoria: "Combos c/ Batata", descricao: "Burger artesanal 160g recheado de queijo, porção generosa de batata frita crocante e refrigerante lata gelado.", preco: 44.90, custo: 16.00, icone: "fa-burger" },
+            { id: 103, nome: "Batata Frita Suprema Cheddar & Bacon", categoria: "Combos c/ Batata", descricao: "Batatas rústicas cobertas com generoso creme de cheddar artesanal e cubinhos crocantes de bacon.", preco: 26.00, custo: 8.50, icone: "fa-box" },
+            { id: 104, nome: "Coca-Cola Lata 350ml Gelada", categoria: "Bebidas", descricao: "Refrigerante Coca-Cola original trincando de gelada.", preco: 6.50, custo: 3.20, icone: "fa-wine-bottle" }
+        ]
+    },
+    {
+        id: "bella-lorena-pizzas",
+        nome: "Pizzaria Bella Lorena",
+        emoji: "🍕",
+        categoriaPrincipal: "Pizzas",
+        categoriaSlug: "pizzas",
+        logo: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=200&auto=format&fit=crop&q=80",
+        capa: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=700&auto=format&fit=crop&q=80",
+        avaliacao: 4.8,
+        totalAvaliacoes: 215,
+        tempoEntrega: "40-60 min",
+        distanciaKm: "1.8 km",
+        taxaEntrega: 8.00,
+        taxaEntregaTexto: "R$ 8,00",
+        pedidoMinimo: 35.00,
+        status: "Aberta",
+        whatsapp: "5512999999999",
+        endereco: "Praça Central, 45 - Centro, Lorena-SP",
+        destaque: "🍕 Massas artesanais de fermentação natural, forno a lenha e bordas recheadas de catupiry original!",
+        destaqueTag: "Tradição Italiana",
+        destaqueTagCor: "bg-red-500",
+        categorias: ["Pizzas Tradicionais", "Pizzas Especiais", "Pizzas Doces", "Bebidas"],
+        produtos: [
+            { id: 201, nome: "Pizza Grande Calabresa Especial", categoria: "Pizzas Tradicionais", descricao: "Molho de tomate pelado italiano, mussarela derretida, fatias finas de calabresa artesanal, cebola e azeitonas.", preco: 52.00, custo: 18.00, icone: "fa-pizza-slice" },
+            { id: 202, nome: "Pizza Grande Quatro Queijos Nobres", categoria: "Pizzas Especiais", descricao: "Mussarela, provolone defumado, queijo gorgonzola suave e Catupiry legítimo com orégano fresco.", preco: 64.00, custo: 23.00, icone: "fa-pizza-slice" },
+            { id: 203, nome: "Pizza Média Chocolate c/ Morango", categoria: "Pizzas Doces", descricao: "Generosa camada de chocolate ao leite cremoso com morangos frescos fatiados.", preco: 45.00, custo: 15.00, icone: "fa-pizza-slice" }
+        ]
+    },
+    {
+        id: "acai-tropical",
+        nome: "Açaí Tropical Mania",
+        emoji: "🍇",
+        categoriaPrincipal: "Açaí & Sorvetes",
+        categoriaSlug: "acai",
+        logo: "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=200&auto=format&fit=crop&q=80",
+        capa: "https://images.unsplash.com/photo-1590301157890-4810ed352733?w=700&auto=format&fit=crop&q=80",
+        avaliacao: 4.9,
+        totalAvaliacoes: 82,
+        tempoEntrega: "20-35 min",
+        distanciaKm: "0.9 km",
+        taxaEntrega: 5.50,
+        taxaEntregaTexto: "R$ 5,50",
+        pedidoMinimo: 18.00,
+        status: "Aberta",
+        whatsapp: "5512999999999",
+        endereco: "Av. Peixoto de Castro, 180 - Lorena-SP",
+        destaque: "🍦 Açaí super cremoso batido na hora com banana, morangos, leite ninho e calda de nutella!",
+        destaqueTag: "Entrega Rápida ⚡",
+        destaqueTagCor: "bg-purple-600",
+        categorias: ["Copos de Açaí", "Açaí na Tigela", "Picolés & Sorvetes"],
+        produtos: [
+            { id: 301, nome: "Copo Açaí Turbinado 500ml", categoria: "Copos de Açaí", descricao: "Açaí batido premium com 3 acompanhamentos à escolha: leite em pó, morango, granola ou leite condensado.", preco: 24.00, custo: 8.00, icone: "fa-ice-cream" },
+            { id: 302, nome: "Tigela Supremo Açaí 700ml c/ Nutella", categoria: "Açaí na Tigela", descricao: "Generosa tigela com açaí artesanal, morangos frescos, rodelas de banana e borda de Nutella pura.", preco: 34.00, custo: 11.50, icone: "fa-bowl-food" }
+        ]
+    },
+    {
+        id: "pastelaria-imperial",
+        nome: "Pastelaria Imperial & Salgados",
+        emoji: "🥟",
+        categoriaPrincipal: "Pastel & Salgados",
+        categoriaSlug: "pasteis",
+        logo: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=200&auto=format&fit=crop&q=80",
+        capa: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=700&auto=format&fit=crop&q=80",
+        avaliacao: 4.8,
+        totalAvaliacoes: 110,
+        tempoEntrega: "25-40 min",
+        distanciaKm: "1.5 km",
+        taxaEntrega: 0.00,
+        taxaEntregaTexto: "Grátis",
+        pedidoMinimo: 20.00,
+        status: "Aberta",
+        whatsapp: "5512999999999",
+        endereco: "Rua Dom Bosco, 88 - Lorena-SP",
+        destaque: "🥐 Pastéis gigantes sequinhos e crocantes de 25cm com recheio de ponta a ponta!",
+        destaqueTag: "Frete Grátis",
+        destaqueTagCor: "bg-emerald-600",
+        categorias: ["Pastéis Gigantes 25cm", "Pastéis Doces", "Coxinhas & Fritos", "Caldos de Cana & Sucos"],
+        produtos: [
+            { id: 401, nome: "Pastel Especial Carne c/ Queijo e Azeitona 25cm", categoria: "Pastéis Gigantes 25cm", descricao: "Massa crocante estaladiça, carne moída bem temperada, mussarela derretida e azeitonas picadas.", preco: 18.00, custo: 5.50, icone: "fa-stroopwafel" },
+            { id: 402, nome: "Pastel Pizza Especial c/ Catupiry 25cm", categoria: "Pastéis Gigantes 25cm", descricao: "Mussarela, presunto, tomate picadinho, orégano e Catupiry cremoso.", preco: 19.00, custo: 6.00, icone: "fa-stroopwafel" },
+            { id: 403, nome: "Caldo de Cana Geladinho 500ml", categoria: "Caldos de Cana & Sucos", descricao: "Moído na hora gelado com limão ou abacaxi.", preco: 9.00, custo: 2.80, icone: "fa-glass-water" }
+        ]
+    }
+];
+

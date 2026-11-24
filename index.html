@@ -11,8 +11,8 @@
 
     <!-- PWA Web App Manifest & Ícones Mobile -->
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" href="img/icon-192.png">
-    <link rel="apple-touch-icon" href="img/icon-192.png">
+    <link rel="icon" type="image/png" href="img/fomek_favicon.png">
+    <link rel="apple-touch-icon" href="img/fomek_favicon.png">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -70,6 +70,26 @@
         #loja-fechada-overlay { backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
 
         .tag-cat { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 700; }
+
+        /* ===== NAVBAR INFERIOR IFOOD STYLE ===== */
+        #bottom-navbar { background: white; border-top: 1px solid #f0e8e9; }
+        .nav-tab { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; flex: 1; cursor: pointer; transition: all .2s; border: none; background: transparent; }
+        .nav-tab .nav-icon { font-size: 20px; line-height: 1; }
+        .nav-tab .nav-label { font-size: 10px; font-weight: 700; color: #9ca3af; transition: color .2s; }
+        .nav-tab.active .nav-label { color: #ab4e5e; }
+        .nav-tab .nav-icon svg, .nav-tab .nav-icon i { color: #9ca3af; transition: color .2s; }
+        .nav-tab.active .nav-icon i { color: #ab4e5e; }
+
+        /* ===== BANNER CAROUSEL ===== */
+        .banner-dot { transition: all .3s ease; }
+
+        /* ===== LOJA CARD IFOOD STYLE ===== */
+        .loja-card-ifood { transition: background .15s; cursor: pointer; }
+        .loja-card-ifood:active { background: #fdf5f6; }
+
+        /* ===== VIEWS EXTRAS ===== */
+        #view-busca, #view-pedidos, #view-perfil { display: none; }
+        #view-busca.ativo, #view-pedidos.ativo, #view-perfil.ativo { display: block; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -82,113 +102,350 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- HERO                                       -->
+    <!-- VIEW 1: HOME MARKETPLACE FOMEK (ESTILO IFOOD) -->
     <!-- ========================================== -->
-    <header class="hero-bg text-white relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-64 h-64 rounded-full bg-white/5 -translate-y-32 translate-x-20"></div>
-        <div class="absolute bottom-0 left-0 w-40 h-40 rounded-full bg-white/5 translate-y-16 -translate-x-12"></div>
+    <div id="view-home-marketplace" class="min-h-screen pb-24 bg-white">
 
-        <!-- Banner PWA: Instalar Aplicativo no Celular -->
-        <div id="pwa-install-banner" class="hidden relative z-20 max-w-xl mx-auto px-4 pt-3 pb-1">
-            <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-2.5 flex items-center justify-between gap-3 text-white shadow-lg">
-                <div class="flex items-center gap-2.5">
-                    <img src="img/icon-192.png" alt="FOMEK" class="w-9 h-9 rounded-xl shadow border border-white/30 object-cover">
-                    <div>
-                        <p class="text-xs font-black leading-tight flex items-center gap-1.5">
-                            Instalar App FOMEK
-                            <span class="bg-amber-400 text-[#2e171e] text-[9px] px-1.5 py-0.2 rounded font-black">GRÁTIS</span>
+        <!-- ===== HEADER ESTILO IFOOD ===== -->
+        <header class="bg-white sticky top-0 z-30 shadow-sm">
+            <div class="max-w-xl mx-auto px-4 pt-3 pb-2 flex items-center justify-between gap-2">
+                <!-- Localização -->
+                <button type="button" onclick="abrirModalCadastroCliente()" class="flex items-center gap-1.5 min-w-0 flex-1 text-left">
+                    <i class="fa-solid fa-location-dot text-[#ab4e5e] text-base shrink-0"></i>
+                    <div class="min-w-0">
+                        <p class="text-[10px] text-slate-400 leading-none">Entregar em</p>
+                        <p class="text-sm font-black text-[#2e171e] flex items-center gap-1 leading-tight truncate">
+                            <span id="header-endereco-txt">Cadastrar endereço</span>
+                            <i class="fa-solid fa-chevron-down text-[#ab4e5e] text-[9px] shrink-0"></i>
                         </p>
-                        <p class="text-[10px] text-rose-200">Acesse direto da sua tela inicial!</p>
                     </div>
-                </div>
-                <div class="flex items-center gap-1.5 flex-shrink-0">
-                    <button id="btn-pwa-install" onclick="instalarPWA()" class="bg-white text-[#2e171e] text-xs font-black px-3 py-1.5 rounded-xl shadow hover:bg-rose-50 transition active:scale-95">
-                        Instalar
-                    </button>
-                    <button onclick="fecharBannerPWA()" class="text-white/60 hover:text-white p-1 text-xs" title="Fechar">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
+                </button>
+                <!-- Sino de notificação -->
+                <button type="button" onclick="abrirPedidos()" class="relative w-10 h-10 rounded-full bg-[#fde8ed] flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-bell text-[#ab4e5e] text-base"></i>
+                    <span class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#ab4e5e] rounded-full text-white text-[9px] font-black flex items-center justify-center">1</span>
+                </button>
             </div>
-        </div>
 
-        <div class="relative z-10 max-w-xl mx-auto px-4 pt-6 pb-5">
-            <div class="flex items-center gap-4">
+            <!-- Barra de busca -->
+            <div class="max-w-xl mx-auto px-4 pb-3">
                 <div class="relative">
-                    <img src="img/logo.png" alt="Da Silva Doceria" class="w-20 h-20 rounded-3xl border-2 border-white/40 object-cover shadow-2xl">
-                    <span id="dot-status" class="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full border-2 border-[#2e171e] flex items-center justify-center">
-                        <i class="fa-solid fa-check text-white text-[9px]"></i>
-                    </span>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-sm text-[10px] font-black uppercase tracking-wider text-rose-100 mb-1">
-                        <i class="fa-solid fa-bolt text-amber-300"></i> FOMEK seu app de Delivery
-                    </div>
-                    <h1 class="font-brand text-2xl font-black leading-tight">Da Silva Doceria</h1>
-                    <p class="text-rose-200 text-xs font-semibold tracking-widest uppercase mt-0.5">✨ Feito com amor & dedicação</p>
-                    <div class="flex flex-wrap items-center gap-2 mt-2">
-                        <span class="text-[11px] bg-white/15 px-2.5 py-1 rounded-full font-semibold flex items-center gap-1">
-                            <i class="fa-solid fa-star text-amber-400 text-[9px]"></i> 5.0 Favorito
-                        </span>
-                        <span class="text-[11px] bg-white/15 px-2.5 py-1 rounded-full font-semibold flex items-center gap-1">
-                            <i class="fa-solid fa-motorcycle text-[9px] text-rose-200"></i>
-                            <span id="hero-tempo">~40 min</span>
-                        </span>
-                        <span id="badge-status-loja" class="text-[11px] bg-emerald-500/80 px-2.5 py-1 rounded-full font-bold flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span> Aberto Agora
-                        </span>
-                    </div>
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="busca-lojas-input" oninput="filtrarLojas(this.value)"
+                        placeholder="Buscar restaurantes ou pratos..."
+                        class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-[#f5f5f5] text-[#2e171e] placeholder-slate-400 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#ab4e5e]">
                 </div>
             </div>
+        </header>
 
-            <div class="mt-4 grid grid-cols-3 gap-2 text-center">
-                <div class="bg-white/10 rounded-2xl p-2.5">
-                    <p id="hero-qtd-itens" class="text-xl font-black">38</p>
-                    <p class="text-[10px] text-rose-200 font-semibold leading-tight">Opções no<br>Cardápio</p>
-                </div>
-                <div class="bg-white/10 rounded-2xl p-2.5">
-                    <p class="text-xl font-black" id="hero-tempo2">40<span class="text-sm">min</span></p>
-                    <p class="text-[10px] text-rose-200 font-semibold leading-tight">Tempo de<br>Entrega</p>
-                </div>
-                <div class="bg-white/10 rounded-2xl p-2.5">
-                    <p id="hero-minimo" class="text-xl font-black">R$<span class="text-base">20</span></p>
-                    <p class="text-[10px] text-rose-200 font-semibold leading-tight">Pedido<br>Mínimo</p>
-                </div>
-            </div>
-        </div>
+        <!-- ===== CORPO PRINCIPAL ===== -->
+        <main class="max-w-xl mx-auto">
 
-        <!-- Busca -->
-        <div class="relative z-10 max-w-xl mx-auto px-4 pb-5">
-            <div class="relative">
-                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[#c58a80]"></i>
-                <input type="text" id="busca-input" oninput="filtrarBusca(this.value)" placeholder="Buscar doces... ex: copinho, brownie" class="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-white text-[#2e171e] placeholder-slate-400 text-sm font-medium shadow-xl focus:outline-none focus:ring-2 focus:ring-[#c58a80]">
-            </div>
-        </div>
-    </header>
+            <!-- GRID 2×4 DE CATEGORIAS (exato estilo iFood) -->
+            <section class="px-4 pt-4 pb-2">
+                <div class="grid grid-cols-4 gap-2">
+                    <button type="button" onclick="filtrarChipLojas('restaurantes')" class="flex flex-col items-center gap-1.5 p-2 rounded-2xl bg-[#fdf5f6] hover:bg-[#fde8ed] active:scale-95 transition-all">
+                        <span class="text-2xl">🍽️</span>
+                        <span class="text-[10px] font-bold text-[#2e171e] leading-tight text-center">Restaurantes</span>
+                    </button>
+                    <button type="button" onclick="filtrarChipLojas('mercado')" class="flex flex-col items-center gap-1.5 p-2 rounded-2xl bg-[#fdf5f6] hover:bg-[#fde8ed] active:scale-95 transition-all">
+                        <span class="text-2xl">🛒</span>
+                        <span class="text-[10px] font-bold text-[#2e171e] leading-tight text-center">Mercados</span>
+                    </button>
+                    <button type="button" onclick="abrirClubeFomek()" class="flex flex-col items-center gap-1.5 p-2 rounded-2xl bg-[#fdf5f6] hover:bg-[#fde8ed] active:scale-95 transition-all">
+                        <span class="text-2xl">🎁</span>
+                        <span class="text-[10px] font-bold text-[#2e171e] leading-tight text-center">Clube FOMEK</span>
+                    </button>
+                    <button type="button" onclick="filtrarChipLojas('doceria')" class="flex flex-col items-center gap-1.5 p-2 rounded-2xl bg-[#fdf5f6] hover:bg-[#fde8ed] active:scale-95 transition-all">
+                        <span class="text-2xl">🍰</span>
+                        <span class="text-[10px] font-bold text-[#2e171e] leading-tight text-center">Docerias</span>
+                    </button>
+                    <button type="button" onclick="filtrarChipLojas('pet')" class="flex flex-col items-center gap-1.5 p-2 rounded-2xl bg-[#fdf5f6] hover:bg-[#fde8ed] active:scale-95 transition-all">
+                        <span class="text-2xl">🐾</span>
+                        <span class="text-[10px] font-bold text-[#2e171e] leading-tight text-center">Pet shops</span>
+                    </button>
+                    <button type="button" onclick="filtrarChipLojas('express')" class="flex flex-col items-center gap-1.5 p-2 rounded-2xl bg-[#fdf5f6] hover:bg-[#fde8ed] active:scale-95 transition-all">
+                        <span class="text-2xl">⚡</span>
+                        <span class="text-[10px] font-bold text-[#2e171e] leading-tight text-center">Express</span>
+                    </button>
+                    <button type="button" onclick="filtrarChipLojas('bebidas')" class="flex flex-col items-center gap-1.5 p-2 rounded-2xl bg-[#fdf5f6] hover:bg-[#fde8ed] active:scale-95 transition-all">
+                        <span class="text-2xl">🧃</span>
+                        <span class="text-[10px] font-bold text-[#2e171e] leading-tight text-center">Bebidas</span>
+                    </button>
+                    <button type="button" onclick="filtrarChipLojas('lojas')" class="flex flex-col items-center gap-1.5 p-2 rounded-2xl bg-[#fdf5f6] hover:bg-[#fde8ed] active:scale-95 transition-all">
+                        <span class="text-2xl">🛍️</span>
+                        <span class="text-[10px] font-bold text-[#2e171e] leading-tight text-center">Shopping</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- CARROSSEL DE BANNERS PROMOCIONAIS -->
+            <section class="px-4 pt-3 pb-1">
+                <div id="banner-carousel-track" class="flex gap-3 overflow-x-auto scrollbar-none snap-x snap-mandatory pb-2" style="-webkit-overflow-scrolling:touch;">
+
+                    <!-- Banner 1: Destaque Da Silva -->
+                    <div onclick="abrirLoja('dasilva-doceria')"
+                        class="banner-slide snap-center shrink-0 w-[85vw] max-w-[320px] h-32 rounded-2xl overflow-hidden relative cursor-pointer active:scale-[0.98] transition-transform"
+                        style="background: linear-gradient(135deg, #2e171e 0%, #8b4454 60%, #ab4e5e 100%);">
+                        <div class="absolute inset-0 p-4 flex items-center gap-3">
+                            <div class="flex-1">
+                                <span class="inline-block bg-white/20 text-white text-[9px] font-black px-2 py-0.5 rounded-full mb-1">bora pedir de novo?</span>
+                                <p class="text-white font-black text-sm leading-tight">peça por</p>
+                                <p class="text-white font-black text-2xl leading-none">R$ <span class="text-3xl">0,99</span></p>
+                            </div>
+                            <img src="img/logo.png" alt="Da Silva Doceria"
+                                class="w-20 h-20 rounded-xl object-cover border-2 border-white/30 shadow-lg shrink-0">
+                        </div>
+                    </div>
+
+                    <!-- Banner 2: Fomek Já -->
+                    <div onclick="filtrarChipLojas('todos')"
+                        class="banner-slide snap-center shrink-0 w-[85vw] max-w-[320px] h-32 rounded-2xl overflow-hidden relative cursor-pointer active:scale-[0.98] transition-transform"
+                        style="background: linear-gradient(135deg, #ab4e5e 0%, #c58a80 100%);">
+                        <div class="absolute inset-0 p-4 flex items-center justify-between">
+                            <div>
+                                <p class="text-white font-black text-xl leading-tight">Pede FOMEK já!</p>
+                                <p class="text-white/80 text-xs mt-1">Delivery rápido em Lorena</p>
+                                <span class="inline-flex items-center gap-1 mt-2 bg-white text-[#ab4e5e] text-[10px] font-black px-3 py-1 rounded-full">
+                                    <i class="fa-solid fa-motorcycle text-[9px]"></i> Ver Lojas
+                                </span>
+                            </div>
+                            <span class="text-5xl">🛵</span>
+                        </div>
+                    </div>
+
+                    <!-- Banner 3: Burger -->
+                    <div onclick="abrirLoja('fomek-burger')"
+                        class="banner-slide snap-center shrink-0 w-[85vw] max-w-[320px] h-32 rounded-2xl overflow-hidden relative cursor-pointer active:scale-[0.98] transition-transform"
+                        style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);">
+                        <div class="absolute inset-0 p-4 flex items-center justify-between">
+                            <div>
+                                <span class="inline-block bg-amber-400 text-black text-[9px] font-black px-2 py-0.5 rounded-full mb-1">🔥 OFERTA</span>
+                                <p class="text-white font-black text-sm leading-tight">Fomek Burger</p>
+                                <p class="text-amber-300 font-black text-lg">Frete Grátis!</p>
+                            </div>
+                            <span class="text-5xl">🍔</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dots indicadores do carrossel -->
+                <div id="banner-dots" class="flex justify-center gap-1.5 mt-1">
+                    <div class="banner-dot w-5 h-1.5 rounded-full bg-[#ab4e5e] transition-all"></div>
+                    <div class="banner-dot w-1.5 h-1.5 rounded-full bg-[#d1c0c3] transition-all"></div>
+                    <div class="banner-dot w-1.5 h-1.5 rounded-full bg-[#d1c0c3] transition-all"></div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO: PROMOÇÕES COM ENTREGA GRÁTIS -->
+            <section class="pt-4 pb-2">
+                <div class="flex items-center justify-between px-4 mb-3">
+                    <h2 class="text-sm font-black text-[#2e171e]">Promoções com entrega grátis</h2>
+                    <button type="button" onclick="filtrarChipLojas('frete-gratis')" class="text-xs font-bold text-[#ab4e5e]">Ver mais</button>
+                </div>
+                <!-- Cards de promoção em grid 2 colunas (renderizado dinamicamente) -->
+                <div id="grid-promocoes-home" class="px-4 grid grid-cols-2 gap-3">
+
+                    <div onclick="abrirLoja('dasilva-doceria')" class="bg-white rounded-2xl overflow-hidden shadow-sm border border-[#f0e8e9] cursor-pointer active:scale-[0.97] transition-transform">
+                        <div class="h-24 bg-gradient-to-br from-[#fde8ed] to-[#f8c8d4] flex items-center justify-center text-4xl">🍬</div>
+                        <div class="p-2.5">
+                            <p class="text-[11px] font-bold text-[#2e171e] leading-tight line-clamp-2">50 Uni. Mini Brigadeiros Sortidos...</p>
+                            <p class="text-xs font-black text-[#16a34a] mt-1">R$ 12,99</p>
+                            <p class="text-[10px] text-slate-400 line-through">R$ 39,99</p>
+                            <div class="flex items-center justify-between mt-1">
+                                <span class="text-[10px] text-slate-400">42–52 min</span>
+                                <span class="text-[10px] font-bold text-[#16a34a]">Grátis</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div onclick="abrirLoja('fomek-burger')" class="bg-white rounded-2xl overflow-hidden shadow-sm border border-[#f0e8e9] cursor-pointer active:scale-[0.97] transition-transform">
+                        <div class="h-24 bg-gradient-to-br from-[#fff3e0] to-[#ffe0b2] flex items-center justify-center text-4xl">🍔</div>
+                        <div class="p-2.5">
+                            <p class="text-[11px] font-bold text-[#2e171e] leading-tight line-clamp-2">X Burguer Artesanal Especial</p>
+                            <p class="text-xs font-black text-[#16a34a] mt-1">R$ 4,99</p>
+                            <p class="text-[10px] text-slate-400 line-through">R$ 20,99</p>
+                            <div class="flex items-center justify-between mt-1">
+                                <span class="text-[10px] text-slate-400">41–51 min</span>
+                                <span class="text-[10px] font-bold text-[#16a34a]">Grátis</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div onclick="abrirLoja('bella-lorena-pizzas')" class="bg-white rounded-2xl overflow-hidden shadow-sm border border-[#f0e8e9] cursor-pointer active:scale-[0.97] transition-transform">
+                        <div class="h-24 bg-gradient-to-br from-[#fce4ec] to-[#f48fb1] flex items-center justify-center text-4xl">🍕</div>
+                        <div class="p-2.5">
+                            <p class="text-[11px] font-bold text-[#2e171e] leading-tight line-clamp-2">Pizza Mix Flavors Grande</p>
+                            <p class="text-xs font-black text-[#16a34a] mt-1">R$ 29,90</p>
+                            <p class="text-[10px] text-slate-400 line-through">R$ 55,00</p>
+                            <div class="flex items-center justify-between mt-1">
+                                <span class="text-[10px] text-slate-400">30–45 min</span>
+                                <span class="text-[10px] font-bold text-[#16a34a]">Grátis</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div onclick="abrirLoja('acai-tropical')" class="bg-white rounded-2xl overflow-hidden shadow-sm border border-[#f0e8e9] cursor-pointer active:scale-[0.97] transition-transform">
+                        <div class="h-24 bg-gradient-to-br from-[#ede7f6] to-[#9575cd] flex items-center justify-center text-4xl">🍇</div>
+                        <div class="p-2.5">
+                            <p class="text-[11px] font-bold text-[#2e171e] leading-tight line-clamp-2">Açaí 500ml com Cobertura</p>
+                            <p class="text-xs font-black text-[#16a34a] mt-1">R$ 15,90</p>
+                            <p class="text-[10px] text-slate-400 line-through">R$ 24,90</p>
+                            <div class="flex items-center justify-between mt-1">
+                                <span class="text-[10px] text-slate-400">20–35 min</span>
+                                <span class="text-[10px] font-bold text-[#16a34a]">Grátis</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- SEÇÃO: CUPOM E ENTREGA GRÁTIS (Lojas circulares) -->
+            <section class="pt-4 pb-2">
+                <div class="flex items-center justify-between px-4 mb-1">
+                    <div>
+                        <h2 class="text-sm font-black text-[#2e171e]">Cupom e entrega grátis</h2>
+                        <p class="text-[11px] text-slate-400">Use seu cupom aqui!</p>
+                    </div>
+                    <button type="button" onclick="filtrarChipLojas('todos')" class="text-xs font-bold text-[#ab4e5e]">Ver mais</button>
+                </div>
+                <!-- Carrossel de Cupons Disponíveis com 1 Toque -->
+                <div id="carrossel-cupons-disponiveis" class="flex gap-2.5 overflow-x-auto scrollbar-none px-4 pt-1 pb-2" style="-webkit-overflow-scrolling:touch;">
+                    <!-- Injetado dinamicamente via JS -->
+                </div>
+                <div id="carrossel-lojas-circulares" class="flex gap-4 overflow-x-auto scrollbar-none px-4 py-3" style="-webkit-overflow-scrolling:touch;">
+                    <!-- Injetado dinamicamente via JS a partir das lojas cadastradas -->
+                </div>
+            </section>
+
+            <!-- DIVISOR -->
+            <div class="h-2 bg-[#f5f5f5] mx-0"></div>
+
+            <!-- SEÇÃO: FAMOSOS NO FOMEK (Feed de Lojas) -->
+            <section class="pt-4 pb-2">
+                <div class="flex items-center justify-between px-4 mb-3">
+                    <h2 class="text-sm font-black text-[#2e171e] flex items-center gap-2">
+                        <i class="fa-solid fa-fire text-[#ab4e5e] text-xs"></i>
+                        Famosos no FOMEK
+                    </h2>
+                    <span id="total-lojas-badge" class="text-[11px] font-bold text-slate-400">5 lojas</span>
+                </div>
+
+                <!-- Feed de Lojas injetado via JS -->
+                <div id="feed-lojas-container" class="space-y-0 divide-y divide-[#f5f5f5]">
+                </div>
+
+                <!-- Sem Lojas Encontradas -->
+                <div id="sem-lojas" class="hidden py-12 text-center space-y-3 px-4">
+                    <div class="w-16 h-16 mx-auto bg-[#fde8ed] rounded-3xl flex items-center justify-center text-3xl">🏬</div>
+                    <h3 class="font-bold text-sm text-[#2e171e]">Nenhuma loja encontrada</h3>
+                    <p class="text-xs text-slate-500 max-w-xs mx-auto">Tente buscar por outro termo ou selecione outra categoria.</p>
+                    <button onclick="limparFiltroLojas()" class="px-4 py-2 bg-[#ab4e5e] text-white rounded-xl text-xs font-bold shadow-xs">Ver Todas as Lojas</button>
+                </div>
+            </section>
+
+        </main>
+    </div>
 
     <!-- ========================================== -->
-    <!-- CORPO                                      -->
+    <!-- VIEW 2: CARDÁPIO EXCLUSIVO DA LOJA SELECIONADA -->
     <!-- ========================================== -->
-    <main class="max-w-xl mx-auto pb-44">
-
-        <!-- Pills de Categoria -->
-        <div id="cats-bar" class="flex gap-2 px-4 py-3.5 overflow-x-auto scrollbar-none bg-white sticky top-0 z-20 border-b border-[#f2d6db] shadow-sm"></div>
-
-        <!-- Grid de Produtos -->
-        <div id="produtos-grid" class="px-4 pt-4 space-y-3"></div>
-
-        <!-- Sem resultado -->
-        <div id="sem-resultado" class="hidden px-4 py-16 text-center space-y-3">
-            <div class="w-16 h-16 mx-auto bg-[#fde8ed] rounded-3xl flex items-center justify-center text-2xl">🍰</div>
-            <p class="font-bold text-[#4a2d36]">Nenhum doce encontrado</p>
-            <button onclick="limparBusca()" class="mt-2 px-5 py-2 bg-[#fde8ed] text-[#ab4e5e] font-bold text-sm rounded-xl border border-[#f0c9d0]">Ver todos os doces</button>
+    <div id="view-cardapio-loja" class="hidden min-h-screen">
+        <!-- Barra de Retorno ao Marketplace -->
+        <div class="bg-[#2e171e] text-white py-2.5 px-4 flex items-center justify-between sticky top-0 z-30 shadow-md">
+            <button type="button" onclick="voltarParaTodasLojas()" class="text-xs font-bold flex items-center gap-2 hover:text-[#e29891] transition-colors cursor-pointer">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Todas as Lojas (FOMEK)</span>
+            </button>
+            <span class="text-[11px] text-rose-200 uppercase tracking-widest font-semibold" id="topbar-nome-loja">Da Silva Doceria</span>
         </div>
-    </main>
+
+        <!-- HERO DA LOJA -->
+        <header id="hero-loja-header" class="hero-bg text-white relative overflow-hidden">
+            <!-- Capa de fundo da loja (se configurada) -->
+            <img id="hero-capa-loja" src="" alt="Capa da Loja" class="hidden absolute inset-0 w-full h-full object-cover opacity-25">
+            <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 pointer-events-none"></div>
+
+            <div class="absolute top-0 right-0 w-64 h-64 rounded-full bg-white/5 -translate-y-32 translate-x-20 pointer-events-none"></div>
+            <div class="absolute bottom-0 left-0 w-40 h-40 rounded-full bg-white/5 translate-y-16 -translate-x-12 pointer-events-none"></div>
+
+            <div class="relative z-10 max-w-xl mx-auto px-4 pt-6 pb-5">
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <img id="hero-logo-img" src="img/logo.png" alt="Logo Loja" class="w-20 h-20 rounded-3xl border-2 border-white/40 object-cover shadow-2xl bg-white">
+                        <span id="dot-status" class="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full border-2 border-[#2e171e] flex items-center justify-center">
+                            <i class="fa-solid fa-check text-white text-[9px]"></i>
+                        </span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-sm text-[10px] font-black uppercase tracking-wider text-rose-100 mb-1">
+                            <i class="fa-solid fa-bolt text-amber-300"></i> FOMEK seu app de Delivery
+                        </div>
+                        <h1 id="hero-nome-loja" class="font-brand text-2xl font-black leading-tight">Da Silva Doceria</h1>
+                        <p id="hero-slogan-loja" class="text-rose-200 text-xs font-semibold tracking-widest uppercase mt-0.5">✨ Feito com amor & dedicação</p>
+                        <div class="flex flex-wrap items-center gap-2 mt-2">
+                            <span id="hero-avaliacao-tag" class="text-[11px] bg-white/15 px-2.5 py-1 rounded-full font-semibold flex items-center gap-1">
+                                <i class="fa-solid fa-star text-amber-400 text-[9px]"></i> <span id="hero-avaliacao-txt">5.0 Favorito</span>
+                            </span>
+                            <span class="text-[11px] bg-white/15 px-2.5 py-1 rounded-full font-semibold flex items-center gap-1">
+                                <i class="fa-solid fa-motorcycle text-[9px] text-rose-200"></i>
+                                <span id="hero-tempo">~40 min</span>
+                            </span>
+                            <span id="badge-status-loja" class="text-[11px] bg-emerald-500/80 px-2.5 py-1 rounded-full font-bold flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span> Aberto Agora
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 grid grid-cols-3 gap-2 text-center">
+                    <div class="bg-white/10 rounded-2xl p-2.5">
+                        <p id="hero-qtd-itens" class="text-xl font-black">38</p>
+                        <p class="text-[10px] text-rose-200 font-semibold leading-tight">Opções no<br>Cardápio</p>
+                    </div>
+                    <div class="bg-white/10 rounded-2xl p-2.5">
+                        <p class="text-xl font-black" id="hero-tempo2">40<span class="text-sm">min</span></p>
+                        <p class="text-[10px] text-rose-200 font-semibold leading-tight">Tempo de<br>Entrega</p>
+                    </div>
+                    <div class="bg-white/10 rounded-2xl p-2.5">
+                        <p id="hero-minimo" class="text-xl font-black">R$<span class="text-base">20</span></p>
+                        <p class="text-[10px] text-rose-200 font-semibold leading-tight">Pedido<br>Mínimo</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Busca no Cardápio da Loja -->
+            <div class="relative z-10 max-w-xl mx-auto px-4 pb-5">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[#c58a80]"></i>
+                    <input type="text" id="busca-input" oninput="filtrarBusca(this.value)" placeholder="Buscar no cardápio... ex: copinho, brownie" class="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-white text-[#2e171e] placeholder-slate-400 text-sm font-medium shadow-xl focus:outline-none focus:ring-2 focus:ring-[#c58a80]">
+                </div>
+            </div>
+        </header>
+
+        <!-- CORPO DO CARDÁPIO DA LOJA -->
+        <main class="max-w-xl mx-auto pb-44">
+
+            <!-- Pills de Categoria da Loja -->
+            <div id="cats-bar" class="flex gap-2 px-4 py-3.5 overflow-x-auto scrollbar-none bg-white sticky top-0 z-20 border-b border-[#f2d6db] shadow-sm"></div>
+
+            <!-- Grid de Produtos da Loja -->
+            <div id="produtos-grid" class="px-4 pt-4 space-y-3"></div>
+
+            <!-- Sem resultado no Cardápio -->
+            <div id="sem-resultado" class="hidden px-4 py-16 text-center space-y-3">
+                <div class="w-16 h-16 mx-auto bg-[#fde8ed] rounded-3xl flex items-center justify-center text-2xl">🍽️</div>
+                <p class="font-bold text-[#4a2d36]">Nenhum item encontrado nesta loja</p>
+                <button onclick="limparBusca()" class="mt-2 px-5 py-2 bg-[#fde8ed] text-[#ab4e5e] font-bold text-sm rounded-xl border border-[#f0c9d0]">Ver todo o cardápio</button>
+            </div>
+        </main>
+    </div><!-- /view-cardapio-loja -->
 
     <!-- ========================================== -->
     <!-- BARRA FLUTUANTE DA SACOLA                  -->
     <!-- ========================================== -->
-    <div id="barra-sacola" class="hidden-bar fixed bottom-0 left-0 right-0 z-40 px-4 pb-6 pt-2 max-w-xl mx-auto" style="left:50%;transform:translateX(-50%) translateY(130%);width:100%;max-width:36rem;">
+    <div id="barra-sacola" class="hidden-bar fixed left-0 right-0 z-50 px-4 pt-2 max-w-xl mx-auto" style="bottom:64px;left:50%;transform:translateX(-50%) translateY(130%);width:100%;max-width:36rem;">
         <button onclick="abrirModalSacola()" class="w-full bg-gradient-to-r from-[#2e171e] to-[#5c2a35] text-white rounded-2xl p-4 shadow-2xl flex items-center justify-between active:scale-98 transition-all">
             <div class="flex items-center gap-3">
                 <div class="relative">
@@ -207,6 +464,287 @@
                 <p class="text-[10px] text-rose-200 font-semibold flex items-center gap-1 justify-end">Ver sacola <i class="fa-solid fa-arrow-right text-[9px]"></i></p>
             </div>
         </button>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- VIEW 3: PERFIL DO CLIENTE                  -->
+    <!-- ========================================== -->
+    <div id="view-perfil" class="hidden min-h-screen pb-28 bg-[#fdf5f6]">
+        <!-- Top bar Perfil -->
+        <header class="bg-[#2e171e] text-white px-4 py-4 sticky top-0 z-30 shadow-md">
+            <div class="max-w-xl mx-auto flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="navSwitchTab('inicio')" class="text-rose-200 hover:text-white transition-colors cursor-pointer">
+                        <i class="fa-solid fa-arrow-left text-lg"></i>
+                    </button>
+                    <h1 class="font-brand font-black text-lg text-white">Meu Perfil FOMEK</h1>
+                </div>
+                <button type="button" onclick="abrirModalCadastroCliente('editar')" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-xl font-bold flex items-center gap-1 text-rose-200 hover:text-white transition-all cursor-pointer">
+                    <i class="fa-solid fa-pen-to-square text-[11px]"></i> Editar
+                </button>
+            </div>
+        </header>
+
+        <main class="max-w-xl mx-auto px-4 py-4 space-y-4">
+            <!-- Card Principal de Usuário -->
+            <div class="bg-white rounded-3xl p-5 shadow-xs border border-[#f0c9d0]/60 text-center relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-16 bg-gradient-to-r from-[#d48491] via-[#ab4e5e] to-[#782333] opacity-20"></div>
+                <div class="relative pt-2">
+                    <div id="perfil-avatar-circulo" class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-[#ab4e5e] to-[#e29891] text-white flex items-center justify-center text-3xl font-black shadow-lg border-4 border-white mb-3">
+                        <span id="perfil-avatar-iniciais">👤</span>
+                    </div>
+                    <h2 id="perfil-nome-exibicao" class="text-lg font-black text-[#2e171e] leading-tight">Cliente FOMEK</h2>
+                    <p id="perfil-email-exibicao" class="text-xs text-slate-500 mt-0.5">cliente@email.com</p>
+                    
+                    <div class="flex items-center justify-center gap-2 mt-3 flex-wrap">
+                        <span id="perfil-badge-status" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            <i class="fa-solid fa-circle-check text-emerald-600"></i> E-mail Verificado
+                        </span>
+                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-[#ab4e5e] border border-[#f0c9d0]">
+                            <i class="fa-solid fa-shield-halved text-[10px]"></i> Perfil Ativo
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card: Endereço de Entrega Principal -->
+            <div class="bg-white rounded-3xl p-5 shadow-xs border border-[#f0c9d0]/60 space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-xl bg-[#fde8ed] text-[#ab4e5e] flex items-center justify-center text-sm">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+                        <h3 class="font-black text-sm text-[#2e171e]">Endereço de Entrega</h3>
+                    </div>
+                    <button type="button" onclick="abrirModalCadastroCliente('endereco')" class="text-xs text-[#ab4e5e] font-bold hover:underline cursor-pointer">
+                        Alterar
+                    </button>
+                </div>
+                <div class="p-3.5 bg-[#fffafb] rounded-2xl border border-[#f5dfe3] text-xs text-slate-600 space-y-1">
+                    <p class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-house text-[#ab4e5e] text-xs"></i>
+                        <span id="perfil-rua-num">Rua não cadastrada</span>
+                    </p>
+                    <p id="perfil-bairro-cidade" class="text-slate-500">Bairro — Lorena, SP</p>
+                    <p id="perfil-comp-ref" class="text-slate-400 italic">Sem complemento</p>
+                </div>
+            </div>
+
+            <!-- Card: Dados Pessoais & Documento -->
+            <div class="bg-white rounded-3xl p-5 shadow-xs border border-[#f0c9d0]/60 space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-xl bg-[#fde8ed] text-[#ab4e5e] flex items-center justify-center text-sm">
+                            <i class="fa-solid fa-id-card"></i>
+                        </div>
+                        <h3 class="font-black text-sm text-[#2e171e]">Dados Pessoais & Segurança</h3>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                    <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                        <p class="text-[10px] text-slate-400 font-bold uppercase">Nome Completo</p>
+                        <p id="perfil-dado-nome" class="font-bold text-slate-700 mt-0.5 truncate">Não informado</p>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                        <p class="text-[10px] text-slate-400 font-bold uppercase flex items-center justify-between">
+                            <span>CPF (Segurança da Loja)</span>
+                            <i class="fa-solid fa-lock text-[9px] text-emerald-600"></i>
+                        </p>
+                        <p id="perfil-dado-cpf" class="font-bold text-slate-700 mt-0.5 font-mono">000.000.000-00</p>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                        <p class="text-[10px] text-slate-400 font-bold uppercase">WhatsApp / Celular</p>
+                        <p id="perfil-dado-telefone" class="font-bold text-slate-700 mt-0.5">(12) 00000-0000</p>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                        <p class="text-[10px] text-slate-400 font-bold uppercase">E-mail Cadastrado</p>
+                        <p id="perfil-dado-email" class="font-bold text-slate-700 mt-0.5 truncate">email@exemplo.com</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 p-2.5 bg-emerald-50 rounded-xl border border-emerald-200 text-[11px] text-emerald-800">
+                    <i class="fa-solid fa-shield-check text-emerald-600 text-sm shrink-0"></i>
+                    <span>Seu CPF e dados são protegidos e agilizam a aprovação e entrega dos seus pedidos pelas lojas parceiras.</span>
+                </div>
+            </div>
+
+            <!-- Card: Preferências & Ofertas -->
+            <div class="bg-white rounded-3xl p-5 shadow-xs border border-[#f0c9d0]/60 space-y-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-xl bg-[#fde8ed] text-[#ab4e5e] flex items-center justify-center text-sm">
+                        <i class="fa-solid fa-tags"></i>
+                    </div>
+                    <h3 class="font-black text-sm text-[#2e171e]">Ofertas & Notificações</h3>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-[#fffafb] rounded-2xl border border-[#f5dfe3]">
+                    <div class="pr-2">
+                        <p class="text-xs font-bold text-slate-800">Receber Cupons e Avisos</p>
+                        <p class="text-[10px] text-slate-500">Ofertas de docerias, hamburguerias e promoções por e-mail e WhatsApp</p>
+                    </div>
+                    <input type="checkbox" id="perfil-toggle-ofertas" checked onchange="alternarReceberOfertas(this.checked)" class="w-5 h-5 accent-[#ab4e5e] rounded cursor-pointer shrink-0">
+                </div>
+            </div>
+
+            <!-- Atalhos e Ações Rápidas -->
+            <div class="space-y-2 pt-2">
+                <button type="button" onclick="window.location.href='pedido.html'" class="w-full py-3.5 px-4 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl font-bold text-xs text-slate-700 flex items-center justify-between shadow-2xs transition-all cursor-pointer">
+                    <span class="flex items-center gap-2.5">
+                        <i class="fa-solid fa-clock-rotate-left text-[#ab4e5e]"></i>
+                        <span>Meus Pedidos Anteriores</span>
+                    </span>
+                    <i class="fa-solid fa-chevron-right text-slate-400 text-[11px]"></i>
+                </button>
+                <button type="button" onclick="abrirModalCadastroCliente('editar')" class="w-full py-3.5 px-4 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl font-bold text-xs text-slate-700 flex items-center justify-between shadow-2xs transition-all cursor-pointer">
+                    <span class="flex items-center gap-2.5">
+                        <i class="fa-solid fa-user-pen text-[#ab4e5e]"></i>
+                        <span>Atualizar Meus Dados & Endereço</span>
+                    </span>
+                    <i class="fa-solid fa-chevron-right text-slate-400 text-[11px]"></i>
+                </button>
+                <button type="button" onclick="limparPerfilCliente()" class="w-full py-3 px-4 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Sair / Redefinir Dados Deste Aparelho</span>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: CADASTRO / PERFIL DO CLIENTE COM 2 PASSOS -->
+    <!-- ========================================== -->
+    <div id="modal-cadastro-cliente" class="modal-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden bg-black/60 backdrop-blur-xs">
+        <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl max-h-[92dvh] flex flex-col animate-in fade-in zoom-in-95 duration-200">
+            <!-- Cabeçalho do Modal -->
+            <div class="p-4 border-b border-[#f0c9d0]/60 flex items-center justify-between bg-gradient-to-r from-[#fff5f7] to-white shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-2xl bg-[#fde8ed] text-[#ab4e5e] flex items-center justify-center font-bold text-base shadow-2xs">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <h3 id="modal-cadastro-titulo" class="font-black text-sm text-[#2e171e]">Perfil & Endereço FOMEK</h3>
+                        <p class="text-[10px] text-slate-400">Identificação segura para pedidos e entrega rápida</p>
+                    </div>
+                </div>
+                <button type="button" onclick="fecharModalCadastroCliente()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Corpo do Modal -->
+            <div class="overflow-y-auto p-5 space-y-4 text-sm flex-1">
+                <!-- ETAPA 1: DADOS PESSOAIS & ENDEREÇO -->
+                <form id="etapa-cadastro-dados" onsubmit="avancarParaVerificacaoEmail(event)" class="space-y-4">
+                    <!-- Banner de Benefícios -->
+                    <div class="p-3 bg-gradient-to-r from-[#fde8ed] to-[#fff0f3] rounded-2xl border border-[#f0c9d0] flex items-center gap-3">
+                        <span class="text-2xl">🎁</span>
+                        <div class="text-[11px] text-[#4a2d36] leading-snug">
+                            <b class="text-[#ab4e5e]">Cadastre seu endereço e e-mail:</b> Seus pedidos serão pré-preenchidos automaticamente e você recebe avisos e cupons de desconto exclusivos!
+                        </div>
+                    </div>
+
+                    <!-- Dados Pessoais -->
+                    <div class="space-y-2.5">
+                        <label class="block text-xs font-black text-[#2e171e] uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fa-solid fa-id-card text-[#ab4e5e]"></i> Seus Dados Pessoais
+                        </label>
+                        <div>
+                            <input type="text" id="cad-nome" placeholder="Nome e Sobrenome completo *" required class="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-2xl focus:border-[#ab4e5e] focus:outline-none bg-[#fffafb]">
+                            <p class="text-[10px] text-slate-400 mt-1 pl-1">Ex: Carlos Alberto da Silva</p>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                                <input type="text" id="cad-cpf" placeholder="CPF do titular *" required oninput="mascaraCPF(this)" class="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-2xl focus:border-[#ab4e5e] focus:outline-none bg-[#fffafb]">
+                                <p class="text-[10px] text-slate-400 mt-1 pl-1"><i class="fa-solid fa-lock text-[9px] text-[#ab4e5e]"></i> Segurança das lojas parceiras</p>
+                            </div>
+                            <div>
+                                <input type="tel" id="cad-telefone" placeholder="WhatsApp com DDD *" required oninput="mascaraTelefone(this)" class="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-2xl focus:border-[#ab4e5e] focus:outline-none bg-[#fffafb]">
+                                <p class="text-[10px] text-slate-400 mt-1 pl-1">Para confirmação e entrega</p>
+                            </div>
+                        </div>
+                        <div>
+                            <input type="email" id="cad-email" placeholder="Seu melhor e-mail *" required class="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-2xl focus:border-[#ab4e5e] focus:outline-none bg-[#fffafb]">
+                            <p class="text-[10px] text-slate-400 mt-1 pl-1">Enviaremos um código de verificação para este e-mail</p>
+                        </div>
+                    </div>
+
+                    <!-- Endereço de Entrega Principal -->
+                    <div class="space-y-2.5 pt-2 border-t border-slate-100">
+                        <label class="block text-xs font-black text-[#2e171e] uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fa-solid fa-location-dot text-[#ab4e5e]"></i> Endereço de Entrega (Lorena - SP)
+                        </label>
+                        <div class="grid grid-cols-4 gap-2">
+                            <input type="text" id="cad-rua" placeholder="Rua / Avenida *" required class="col-span-3 px-4 py-3 text-sm border-2 border-slate-200 rounded-2xl focus:border-[#ab4e5e] focus:outline-none bg-[#fffafb]">
+                            <input type="text" id="cad-numero" placeholder="Nº *" required class="col-span-1 px-3 py-3 text-sm border-2 border-slate-200 rounded-2xl focus:border-[#ab4e5e] focus:outline-none bg-[#fffafb] text-center">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" id="cad-complemento" placeholder="Apto / Bloco / Casa" class="px-4 py-3 text-sm border-2 border-slate-200 rounded-2xl focus:border-[#ab4e5e] focus:outline-none bg-[#fffafb]">
+                            <input type="text" id="cad-bairro" placeholder="Bairro em Lorena *" required class="px-4 py-3 text-sm border-2 border-slate-200 rounded-2xl focus:border-[#ab4e5e] focus:outline-none bg-[#fffafb]">
+                        </div>
+                        <input type="text" id="cad-referencia" placeholder="Ponto de referência (opcional)" class="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-2xl focus:border-[#ab4e5e] focus:outline-none bg-[#fffafb]">
+                    </div>
+
+                    <!-- Opt-in de ofertas -->
+                    <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 flex items-start gap-2.5">
+                        <input type="checkbox" id="cad-ofertas" checked class="w-4 h-4 mt-0.5 accent-[#ab4e5e] rounded cursor-pointer shrink-0">
+                        <label for="cad-ofertas" class="text-xs text-slate-600 leading-tight cursor-pointer">
+                            Quero receber cupons de desconto, avisos de entrega e promoções exclusivas no meu e-mail e WhatsApp.
+                        </label>
+                    </div>
+
+                    <!-- Botão Avançar -->
+                    <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-[#ab4e5e] to-[#782333] hover:opacity-95 text-white font-black rounded-2xl shadow-md flex items-center justify-center gap-2 text-sm transition-all cursor-pointer">
+                        <span>Avançar para Verificação de E-mail</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </form>
+
+                <!-- ETAPA 2: VERIFICAÇÃO DE E-MAIL COM CÓDIGO DE 6 DÍGITOS -->
+                <div id="etapa-cadastro-codigo" class="hidden space-y-4 text-center">
+                    <div class="w-16 h-16 mx-auto rounded-3xl bg-[#fde8ed] text-[#ab4e5e] flex items-center justify-center text-3xl shadow-xs">
+                        <i class="fa-solid fa-envelope-open-text"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-black text-base text-[#2e171e]">Verifique seu E-mail</h4>
+                        <p class="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
+                            Enviamos um código de segurança de 6 dígitos para o e-mail:
+                            <br><b id="cad-codigo-email-dest" class="text-[#ab4e5e] font-bold">cliente@email.com</b>
+                        </p>
+                    </div>
+
+                    <!-- Simulação do Código Enviado em Tela para Testes e Facilidade -->
+                    <div class="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-left flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-lg shrink-0">
+                            <i class="fa-solid fa-key"></i>
+                        </div>
+                        <div class="text-xs text-emerald-900 min-w-0">
+                            <p class="font-bold">Simulação de E-mail Enviado:</p>
+                            <p class="text-[11px] text-emerald-700">Seu código gerado é: <span id="cad-codigo-banner-simulado" class="font-mono font-black text-sm tracking-wider text-emerald-900 bg-white px-2 py-0.5 rounded-lg border border-emerald-300 ml-1">------</span></p>
+                        </div>
+                    </div>
+
+                    <form onsubmit="confirmarCodigoVerificacao(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Digite o código de 6 dígitos</label>
+                            <input type="text" id="cad-codigo-input" maxlength="6" placeholder="000000" required class="w-48 mx-auto px-4 py-3 text-2xl font-mono font-black tracking-widest text-center border-2 border-slate-300 rounded-2xl focus:border-[#ab4e5e] focus:outline-none bg-[#fffafb]">
+                        </div>
+
+                        <div class="flex flex-col gap-2 pt-2">
+                            <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:bg-emerald-700 text-white font-black rounded-2xl shadow-md flex items-center justify-center gap-2 text-sm transition-all cursor-pointer">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span>Confirmar Código & Concluir</span>
+                            </button>
+                            <div class="flex items-center justify-between text-xs pt-2">
+                                <button type="button" onclick="voltarParaEtapa1()" class="text-slate-500 hover:text-slate-700 font-bold flex items-center gap-1 cursor-pointer">
+                                    <i class="fa-solid fa-arrow-left text-[10px]"></i> Corrigir dados
+                                </button>
+                                <button type="button" onclick="reenviarCodigoVerificacao()" class="text-[#ab4e5e] font-bold hover:underline flex items-center gap-1 cursor-pointer">
+                                    <i class="fa-solid fa-rotate-right text-[10px]"></i> Reenviar código
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- ========================================== -->
@@ -347,9 +885,18 @@
 
                     <!-- Dados pessoais -->
                     <div class="space-y-3">
-                        <label class="block text-xs font-bold text-[#4a2d36] uppercase tracking-wider"><i class="fa-solid fa-user text-[#c58a80] mr-1"></i> Seus dados</label>
-                        <input type="text" id="inp-nome" placeholder="Seu nome completo *" required class="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-2xl focus:border-[#c58a80] focus:outline-none bg-[#fffafb]">
-                        <input type="tel" id="inp-whats" placeholder="WhatsApp com DDD *" required class="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-2xl focus:border-[#c58a80] focus:outline-none bg-[#fffafb]" oninput="mascaraTelefone(this)">
+                        <div class="flex items-center justify-between">
+                            <label class="block text-xs font-bold text-[#4a2d36] uppercase tracking-wider"><i class="fa-solid fa-user text-[#c58a80] mr-1"></i> Seus dados</label>
+                            <span class="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200 font-bold flex items-center gap-1">
+                                <i class="fa-solid fa-shield-halved text-[9px]"></i> Compra Segura
+                            </span>
+                        </div>
+                        <input type="text" id="inp-nome" placeholder="Seu nome completo (Nome e Sobrenome) *" required class="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-2xl focus:border-[#c58a80] focus:outline-none bg-[#fffafb]">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <input type="tel" id="inp-whats" placeholder="WhatsApp com DDD *" required class="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-2xl focus:border-[#c58a80] focus:outline-none bg-[#fffafb]" oninput="mascaraTelefone(this)">
+                            <input type="text" id="inp-cpf" placeholder="CPF do titular *" required class="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-2xl focus:border-[#c58a80] focus:outline-none bg-[#fffafb]" oninput="mascaraCPF(this)">
+                        </div>
+                        <input type="email" id="inp-email" placeholder="E-mail (para notas e avisos)" class="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-2xl focus:border-[#c58a80] focus:outline-none bg-[#fffafb]">
                     </div>
 
                     <!-- Endereço (delivery) -->
@@ -434,6 +981,23 @@
                         <textarea id="inp-obs-geral" rows="2" placeholder="Embalagem especial, horário preferido..." class="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-2xl focus:border-[#c58a80] focus:outline-none bg-[#fffafb] resize-none"></textarea>
                     </div>
 
+                    <!-- Bloco Cupom de Desconto / Entrega Grátis -->
+                    <div class="bg-gradient-to-br from-[#fffafb] to-[#fde8ed]/40 border-2 border-[#f0c9d0] rounded-2xl p-3.5 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="block text-xs font-black text-[#2e171e] uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="fa-solid fa-ticket text-[#ab4e5e]"></i> Cupom de Desconto / Frete Grátis
+                            </label>
+                            <span id="cupom-status-tag" class="text-[10px] font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-300 hidden"></span>
+                        </div>
+                        <div class="flex gap-2">
+                            <input type="text" id="inp-cupom" placeholder="Digite seu cupom (ex: FRETEGRATIS)" class="flex-1 px-4 py-2.5 text-xs uppercase font-mono font-bold border-2 border-slate-200 rounded-xl focus:border-[#ab4e5e] focus:outline-none bg-white">
+                            <button type="button" onclick="aplicarCupomCheckout()" class="px-4 py-2.5 bg-[#ab4e5e] hover:bg-[#8b3846] text-white text-xs font-black rounded-xl shadow-xs transition-all cursor-pointer">
+                                Aplicar
+                            </button>
+                        </div>
+                        <p id="cupom-info-msg" class="text-[11px] text-emerald-800 font-medium hidden flex items-center gap-1"></p>
+                    </div>
+
                     <!-- Resumo -->
                     <div class="bg-gradient-to-br from-[#fff8f9] to-[#fde8ed]/40 border border-[#f0c9d0] rounded-2xl p-4 space-y-2">
                         <p class="text-xs font-bold text-[#4a2d36] uppercase flex items-center gap-1.5"><i class="fa-solid fa-receipt text-[#c58a80]"></i> Resumo</p>
@@ -441,6 +1005,10 @@
                         <div class="border-t border-[#f0c9d0] pt-2 space-y-1">
                             <div class="flex justify-between text-sm"><span class="text-slate-500">Subtotal</span><span id="resumo-subtotal" class="font-semibold text-[#4a2d36]">R$ 0,00</span></div>
                             <div class="flex justify-between text-sm"><span class="text-slate-500">Entrega</span><span id="resumo-frete" class="font-semibold text-slate-500">A calcular</span></div>
+                            <div id="resumo-linha-desconto" class="hidden flex justify-between text-sm text-emerald-700 font-bold">
+                                <span class="flex items-center gap-1"><i class="fa-solid fa-tag"></i> Desconto Cupom (<span id="resumo-cupom-nome"></span>)</span>
+                                <span id="resumo-desconto-valor">- R$ 0,00</span>
+                            </div>
                             <div class="flex justify-between text-base font-black text-[#2e171e] border-t border-[#f0c9d0] pt-2"><span>Total</span><span id="resumo-total">R$ 0,00</span></div>
                         </div>
                     </div>
@@ -456,20 +1024,138 @@
         </div>
     </div>
 
-    <!-- Toast -->
-    <div id="toast-container" class="fixed bottom-32 left-0 right-0 z-[999] flex flex-col items-center gap-2 px-4 pointer-events-none"></div>
+    <!-- ========================================== -->
+    <!-- MODAL: PAGAMENTO PIX ASAAS & QR CODE       -->
+    <!-- ========================================== -->
+    <div id="modal-pix" onclick="fecharSeClicarFora(event,'modal-pix')" class="modal-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden bg-black/50">
+        <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-[#f0c9d0] animate-card">
+            <div class="p-4 bg-gradient-to-r from-[#fde8ed] to-[#fff5f7] border-b border-[#f0c9d0] flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-xl bg-white text-[#ab4e5e] flex items-center justify-center shadow-xs">
+                        <i class="fa-brands fa-pix text-lg"></i>
+                    </span>
+                    <div>
+                        <h3 class="font-bold text-sm text-[#2e171e]">Pagamento via PIX</h3>
+                        <p class="text-[10px] text-[#8a3847]">Confirmação instantânea do pedido</p>
+                    </div>
+                </div>
+                <button type="button" onclick="fecharModalPix()" class="w-8 h-8 rounded-full bg-white text-slate-400 hover:text-slate-600 flex items-center justify-center shadow-xs cursor-pointer">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
 
-    <!-- Data.js & Frete.js -->
+            <div class="p-5 overflow-y-auto space-y-4 text-center">
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold border border-emerald-200">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="modal-pix-status-txt">Aguardando Pagamento</span>
+                </div>
+
+                <div class="p-3 bg-[#fff8f9] rounded-2xl border border-[#faedf0] inline-block mx-auto">
+                    <img id="modal-pix-qr-img" src="" alt="QR Code PIX" class="w-52 h-52 mx-auto rounded-xl object-contain bg-white p-2 shadow-xs">
+                </div>
+
+                <div>
+                    <p class="text-xs text-slate-500">Valor a Pagar:</p>
+                    <p id="modal-pix-valor" class="text-2xl font-black text-[#ab4e5e]">R$ 0,00</p>
+                </div>
+
+                <div class="space-y-1.5 text-left">
+                    <label class="block text-[11px] font-bold text-[#4a2d36] uppercase tracking-wider">Pix Copia e Cola:</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="modal-pix-copia-cola" readonly class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-700 focus:outline-none select-all">
+                        <button type="button" onclick="copiarPixModal()" class="px-4 py-2 bg-[#ab4e5e] hover:bg-[#96404f] text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 shadow-sm">
+                            <i class="fa-regular fa-copy"></i>
+                            <span id="modal-pix-btn-txt">Copiar</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-[11px] text-amber-800 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-clock text-amber-600"></i>
+                    <span>Abra o app do seu banco, escolha Pix e escaneie ou cole o código acima.</span>
+                </div>
+
+                <!-- Botões de Ação do Modal Pix -->
+                <div class="space-y-2 pt-2">
+                    <button type="button" id="btn-pix-abrir-whats" onclick="concluirEIrParaWhats()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl shadow-md flex items-center justify-center gap-2 text-xs transition-all cursor-pointer">
+                        <i class="fa-brands fa-whatsapp text-base"></i>
+                        <span>Enviar Pedido no WhatsApp da Loja</span>
+                    </button>
+                    <button type="button" id="btn-pix-acompanhar" onclick="irParaAcompanhamento()" class="w-full py-2.5 bg-white hover:bg-[#fff0f3] text-[#ab4e5e] font-bold rounded-2xl border border-[#f0c9d0] flex items-center justify-center gap-2 text-xs transition-all cursor-pointer">
+                        <i class="fa-solid fa-receipt text-xs"></i>
+                        <span>Acompanhar Pedido em Tempo Real</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- NAVBAR INFERIOR 5 ABAS (ESTILO IFOOD)      -->
+    <!-- ========================================== -->
+    <nav id="bottom-navbar" class="fixed bottom-0 left-0 right-0 z-40 max-w-xl mx-auto flex items-center safe-b" style="padding-bottom: env(safe-area-inset-bottom, 0px);">
+        <!-- Início -->
+        <button id="nav-tab-inicio" type="button" onclick="navSwitchTab('inicio')" class="nav-tab active">
+            <span class="nav-icon"><i class="fa-solid fa-house"></i></span>
+            <span class="nav-label">Início</span>
+        </button>
+        <!-- Busca -->
+        <button id="nav-tab-busca" type="button" onclick="navSwitchTab('busca')" class="nav-tab">
+            <span class="nav-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+            <span class="nav-label">Busca</span>
+        </button>
+        <!-- Loja iFood / Cardápio -->
+        <button id="nav-tab-lojas" type="button" onclick="navSwitchTab('lojas')" class="nav-tab">
+            <span class="nav-icon"><i class="fa-solid fa-store"></i></span>
+            <span class="nav-label">Lojas</span>
+        </button>
+        <!-- Pedidos -->
+        <button id="nav-tab-pedidos" type="button" onclick="navSwitchTab('pedidos')" class="nav-tab">
+            <span class="nav-icon"><i class="fa-solid fa-receipt"></i></span>
+            <span class="nav-label">Pedidos</span>
+        </button>
+        <!-- Perfil -->
+        <button id="nav-tab-perfil" type="button" onclick="navSwitchTab('perfil')" class="nav-tab relative">
+            <span class="nav-icon relative inline-block">
+                <i class="fa-solid fa-user"></i>
+                <span class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-[#ab4e5e] rounded-full text-white text-[8px] font-black flex items-center justify-center">1</span>
+            </span>
+            <span class="nav-label">Perfil</span>
+        </button>
+    </nav>
+
+    <!-- Toast (posição acima da navbar) -->
+    <div id="toast-container" class="fixed bottom-20 left-0 right-0 z-[999] flex flex-col items-center gap-2 px-4 pointer-events-none"></div>
+
+    <!-- Data.js, Frete.js & Asaas.js -->
     <script src="js/data.js"></script>
     <script src="js/frete.js"></script>
+    <script src="js/asaas.js"></script>
 
     <!-- ========================================== -->
     <!-- LÓGICA DO PEDE AÍ                          -->
     <!-- ========================================== -->
     <script>
     // =============================================
-    // ESTADO GLOBAL
+    // ESTADO GLOBAL & MARKETPLACE MULTI-LOJAS
     // =============================================
+    function obterLojasMarketplace() {
+        try {
+            const salvas = localStorage.getItem('fomek_lojas_master');
+            if (salvas) {
+                const parsed = JSON.parse(salvas);
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            }
+        } catch(e) {}
+        return typeof LOJAS_PADRAO !== 'undefined' ? JSON.parse(JSON.stringify(LOJAS_PADRAO)) : [];
+    }
+
+    let lojasMarketplace = obterLojasMarketplace();
+    let lojaAtual = lojasMarketplace[0] || null;
+    let categoriaMarketplaceAtiva = 'todos';
+    let filtroChipAtivo = 'todos';
+    let buscaMarketplaceTermo = '';
+
     let sacola = [];
     let produtosCardapio = [];
     let faixasEntrega = [];
@@ -488,53 +1174,724 @@
         'Copudim':                    { bg: '#f3e8ff', text: '#7c3aed' },
         'Bombons & Doces':            { bg: '#fce7f3', text: '#be185d' },
         'Fondue & Petisqueiras':      { bg: '#dcfce7', text: '#166534' },
-        'Brigadeiros Tradicionais':   { bg: '#fef9c3', text: '#854d0e' }
+        'Brigadeiros Tradicionais':   { bg: '#fef9c3', text: '#854d0e' },
+        'Smash Burgers':              { bg: '#fef3c7', text: '#92400e' },
+        'Combos c/ Batata':           { bg: '#fee2e2', text: '#991b1b' },
+        'Pizzas Tradicionais':        { bg: '#fee2e2', text: '#991b1b' },
+        'Pizzas Especiais':           { bg: '#fef3c7', text: '#92400e' },
+        'Copos de Açaí':              { bg: '#f3e8ff', text: '#6b21a8' },
+        'Pastéis Gigantes 25cm':      { bg: '#fef9c3', text: '#854d0e' }
     };
     const emojiCat = {
         'Copos da Felicidade':'🥤','Cones & Cascões':'🍦','Fatias & Brownies':'🍰',
         'Afogadinhos & Escondidinhos':'🍮','Copudim':'🍮','Bombons & Doces':'🍬',
-        'Fondue & Petisqueiras':'🍓','Brigadeiros Tradicionais':'🍫'
+        'Fondue & Petisqueiras':'🍓','Brigadeiros Tradicionais':'🍫',
+        'Smash Burgers':'🍔','Burgers Especiais':'🍔','Combos c/ Batata':'🍟',
+        'Pizzas Tradicionais':'🍕','Pizzas Especiais':'🍕','Pizzas Doces':'🍫',
+        'Copos de Açaí':'🍦','Açaí na Tigela':'🍧',
+        'Pastéis Gigantes 25cm':'🥐','Pastéis Doces':'🍫','Caldos de Cana & Sucos':'🥤'
     };
 
     // =============================================
-    // INICIALIZAÇÃO (lê tudo do localStorage)
+    // INICIALIZAÇÃO
     // =============================================
     function init() {
-        // Dados do cardápio (sempre sincronia com o Gestor)
-        const prodSalvos = localStorage.getItem('ds_produtos_v2');
-        produtosCardapio = prodSalvos ? JSON.parse(prodSalvos) : [...PRODUTOS_PADRAO];
+        // Carrega lojas atualizadas cadastradas pelo Dono no Gestor
+        lojasMarketplace = obterLojasMarketplace();
+
+        // Injeta produtos e personalizações de layout salvas no gestor de volta em cada loja do marketplace
+        lojasMarketplace.forEach(loja => {
+            // Layout da loja (logo, capa, cores personalizadas)
+            try {
+                const layoutSalvo = localStorage.getItem('ds_layout_' + loja.id);
+                if (layoutSalvo) {
+                    const lObj = JSON.parse(layoutSalvo);
+                    Object.assign(loja, lObj);
+                }
+            } catch(e) {}
+
+            if (loja.id === 'dasilva-doceria') {
+                const prodSalvos = localStorage.getItem('ds_produtos_v2');
+                const catSalvas = localStorage.getItem('ds_categorias');
+                if (prodSalvos) {
+                    try { loja.produtos = JSON.parse(prodSalvos); } catch(e) {}
+                }
+                if (catSalvas) {
+                    try { loja.categorias = JSON.parse(catSalvas); } catch(e) {}
+                }
+            } else {
+                const prodSalvos = localStorage.getItem('ds_produtos_' + loja.id);
+                const catSalvas = localStorage.getItem('ds_categorias_' + loja.id);
+                if (prodSalvos) {
+                    try {
+                        const parsed = JSON.parse(prodSalvos);
+                        if (parsed.length > 0) loja.produtos = parsed;
+                    } catch(e) {}
+                }
+                if (catSalvas) {
+                    try {
+                        const parsed = JSON.parse(catSalvas);
+                        if (parsed.length > 0) loja.categorias = parsed;
+                    } catch(e) {}
+                }
+                // Status e config da loja
+                try {
+                    const cfg = JSON.parse(localStorage.getItem('ds_config_' + loja.id) || '{}');
+                    if (cfg.lojaAberta !== undefined) {
+                        loja.status = cfg.lojaAberta ? 'Aberta' : 'Fechada';
+                        if (cfg.pedidoMinimo) loja.pedidoMinimo = cfg.pedidoMinimo;
+                        if (cfg.tempoEntrega) loja.tempoEntrega = cfg.tempoEntrega;
+                    }
+                } catch(e) {}
+            }
+        });
 
         const faixasSalvas = localStorage.getItem('ds_faixasKM');
         faixasEntrega = faixasSalvas ? JSON.parse(faixasSalvas) : [...FAIXAS_KM_PADRAO];
 
-        // Configurações da loja
+        // Configurações da loja (Da Silva como padrão para o app cliente)
         try {
             configLoja = JSON.parse(localStorage.getItem('ds_config_loja') || '{}');
         } catch(e) { configLoja = {}; }
 
         aplicarConfigLoja();
-        renderCategorias();
-        renderProdutos();
-        freteAtual = 6.50;
 
-        // Puxar imediatamente da nuvem (para clientes que acessam pelo celular pela primeira vez)
+        // Verificar se foi passado parâmetro de loja direta (ex: ?loja=dasilva-doceria)
+        const params = new URLSearchParams(window.location.search);
+        const lojaParam = params.get('loja');
+        if (lojaParam) {
+            abrirLoja(lojaParam);
+        } else {
+            renderHomeMarketplace();
+        }
+
+        // Puxar imediatamente da nuvem
         puxarCardapioNuvem();
 
-        // Ouvir mudanças do Gestor em tempo real (mesmo dispositivo ou mesma aba)
+        // Carregar Perfil do Cliente & Cupons da plataforma
+        carregarPerfilCliente();
+        renderCarrosselCuponsHome();
+
+        // Ouvir mudanças do Gestor em tempo real (produtos, lojas novas etc.)
         window.addEventListener('storage', (e) => {
-            if (['ds_produtos_v2','ds_faixasKM','ds_config_loja'].includes(e.key)) {
-                init();
+            if (['ds_produtos_v2','ds_faixasKM','ds_config_loja','fomek_lojas_master','fomek_cupons','fomek_cliente_perfil'].includes(e.key) ||
+                e.key?.startsWith('ds_produtos_') || e.key?.startsWith('ds_categorias_')) {
+                lojasMarketplace = obterLojasMarketplace();
+                carregarPerfilCliente();
+                renderCarrosselCuponsHome();
+                renderHomeMarketplace();
             }
         });
 
-        // Polling a cada 20s para atualizar cardápio e status da loja em tempo real
+        window.addEventListener('fomek_lojas_atualizadas', () => {
+            lojasMarketplace = obterLojasMarketplace();
+            renderHomeMarketplace();
+        });
+
+        // Polling a cada 20s
         setInterval(() => {
             puxarCardapioNuvem();
         }, 20000);
     }
 
-    // Puxar cardápio completo e configurações atualizadas da nuvem
+    // =============================================
+    // FUNÇÕES DO MARKETPLACE DE LOJAS (TIPO IFOOD)
+    // =============================================
+
+    function renderHomeMarketplace() {
+        const catBar = document.getElementById('categorias-marketplace-bar');
+        if (catBar && typeof CATEGORIAS_MARKETPLACE !== 'undefined') {
+            catBar.innerHTML = CATEGORIAS_MARKETPLACE.map(c => {
+                const ativo = categoriaMarketplaceAtiva === c.id;
+                return `
+                    <button type="button" onclick="filtrarCategoriaMarketplace('${c.id}')" class="flex flex-col items-center gap-1.5 p-2 rounded-2xl shrink-0 transition-all ${ativo ? 'bg-[#2e171e] text-white shadow-md scale-105' : 'bg-white text-[#4a2d36] hover:bg-[#fff0f3]'} border border-[#f0c9d0]/60 shadow-2xs min-w-[76px] cursor-pointer">
+                        <span class="text-2xl">${c.emoji}</span>
+                        <span class="text-[11px] font-bold whitespace-nowrap">${c.nome}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        renderCarrosselLojasCirculares();
+        renderBannersPromocionais();
+        renderPromocoesHome();
+        renderFeedLojas();
+    }
+
+    // Renderiza os banners do carrossel no topo do App (vindos da Central ou Padrão)
+    function renderBannersPromocionais() {
+        const track = document.getElementById('banner-carousel-track');
+        if (!track) return;
+
+        let promoData = null;
+        try {
+            promoData = JSON.parse(localStorage.getItem('fomek_promotions') || 'null');
+        } catch(e) {}
+
+        const banners = (promoData && Array.isArray(promoData.banners) && promoData.banners.length > 0)
+            ? promoData.banners.filter(b => b.ativo !== false)
+            : [
+                {
+                    id: 'b1',
+                    titulo: 'peça por R$ 0,99',
+                    subtitulo: 'bora pedir de novo?',
+                    lojaId: 'dasilva-doceria',
+                    gradiente: 'linear-gradient(135deg, #2e171e 0%, #8b4454 60%, #ab4e5e 100%)',
+                    imagem: 'img/logo.png',
+                    emoji: '🍰'
+                },
+                {
+                    id: 'b2',
+                    titulo: 'Pede FOMEK já!',
+                    subtitulo: 'Delivery rápido em Lorena',
+                    lojaId: '',
+                    gradiente: 'linear-gradient(135deg, #ab4e5e 0%, #c58a80 100%)',
+                    imagem: '',
+                    emoji: '🛵'
+                },
+                {
+                    id: 'b3',
+                    titulo: 'Frete Grátis hoje!',
+                    subtitulo: 'Fomek Burger & Grill',
+                    lojaId: 'fomek-burger',
+                    gradiente: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%)',
+                    imagem: '',
+                    emoji: '🍔'
+                }
+            ];
+
+        track.innerHTML = banners.map(b => {
+            const clickAction = b.lojaId ? `onclick="abrirLoja('${b.lojaId}')"` : `onclick="filtrarChipLojas('todos')"`;
+            const bgGrad = b.gradiente || 'linear-gradient(135deg, #2e171e 0%, #ab4e5e 100%)';
+            return `
+                <div ${clickAction}
+                    class="banner-slide snap-center shrink-0 w-[85vw] max-w-[320px] h-32 rounded-2xl overflow-hidden relative cursor-pointer active:scale-[0.98] transition-transform"
+                    style="background: ${bgGrad};">
+                    <div class="absolute inset-0 p-4 flex items-center justify-between gap-3">
+                        <div class="flex-1">
+                            ${b.subtitulo ? `<span class="inline-block bg-white/20 text-white text-[9px] font-black px-2 py-0.5 rounded-full mb-1">${b.subtitulo}</span>` : ''}
+                            <p class="text-white font-black text-lg leading-tight line-clamp-2">${b.titulo}</p>
+                            ${b.tag ? `<span class="inline-block bg-amber-400 text-black text-[9px] font-black px-2 py-0.5 rounded-full mt-1.5">${b.tag}</span>` : ''}
+                        </div>
+                        ${b.imagem ? `
+                            <img src="${b.imagem}" alt="Promo" class="w-20 h-20 rounded-xl object-cover border-2 border-white/30 shadow-lg shrink-0" onerror="this.outerHTML='<span class=\'text-5xl\'>${b.emoji||'🎁'}</span>'">
+                        ` : `<span class="text-5xl">${b.emoji || '🎁'}</span>`}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Renderiza os cards da seção Promoções com Entrega Grátis
+    function renderPromocoesHome() {
+        const grid = document.getElementById('grid-promocoes-home');
+        if (!grid) return;
+
+        let promoData = null;
+        try {
+            promoData = JSON.parse(localStorage.getItem('fomek_promotions') || 'null');
+        } catch(e) {}
+
+        const ofertas = (promoData && Array.isArray(promoData.ofertas) && promoData.ofertas.length > 0)
+            ? promoData.ofertas.filter(o => o.ativo !== false)
+            : [
+                {
+                    id: 'p1',
+                    titulo: '50 Uni. Mini Brigadeiros Sortidos Gourmet',
+                    lojaId: 'dasilva-doceria',
+                    precoDe: '39,99',
+                    precoPor: '12,99',
+                    tempo: '42–52 min',
+                    frete: 'Grátis',
+                    emoji: '🍬',
+                    imagem: '',
+                    bgCard: 'from-[#fde8ed] to-[#f8c8d4]'
+                },
+                {
+                    id: 'p2',
+                    titulo: 'X Burguer Artesanal Especial c/ Queijo',
+                    lojaId: 'fomek-burger',
+                    precoDe: '20,99',
+                    precoPor: '4,99',
+                    tempo: '41–51 min',
+                    frete: 'Grátis',
+                    emoji: '🍔',
+                    imagem: '',
+                    bgCard: 'from-[#fff3e0] to-[#ffe0b2]'
+                },
+                {
+                    id: 'p3',
+                    titulo: 'Pizza Mix Flavors Grande Especial',
+                    lojaId: 'bella-lorena-pizzas',
+                    precoDe: '55,00',
+                    precoPor: '29,90',
+                    tempo: '30–45 min',
+                    frete: 'Grátis',
+                    emoji: '🍕',
+                    imagem: '',
+                    bgCard: 'from-[#fce4ec] to-[#f48fb1]'
+                },
+                {
+                    id: 'p4',
+                    titulo: 'Açaí 500ml com Cobertura e Frutas',
+                    lojaId: 'acai-tropical',
+                    precoDe: '24,90',
+                    precoPor: '15,90',
+                    tempo: '20–35 min',
+                    frete: 'Grátis',
+                    emoji: '🍇',
+                    imagem: '',
+                    bgCard: 'from-[#ede7f6] to-[#9575cd]'
+                }
+            ];
+
+        grid.innerHTML = ofertas.map(o => {
+            const bgGradient = o.bgCard || 'from-[#fde8ed] to-[#f8c8d4]';
+            const clickAction = o.lojaId ? `onclick="abrirLoja('${o.lojaId}')"` : '';
+            return `
+                <div ${clickAction} class="bg-white rounded-2xl overflow-hidden shadow-sm border border-[#f0e8e9] cursor-pointer active:scale-[0.97] transition-transform">
+                    <div class="h-24 bg-gradient-to-br ${bgGradient} flex items-center justify-center text-4xl overflow-hidden">
+                        ${o.imagem ? `<img src="${o.imagem}" class="w-full h-full object-cover">` : (o.emoji || '🍽️')}
+                    </div>
+                    <div class="p-2.5">
+                        <p class="text-[11px] font-bold text-[#2e171e] leading-tight line-clamp-2">${o.titulo}</p>
+                        <p class="text-xs font-black text-[#16a34a] mt-1">R$ ${o.precoPor}</p>
+                        ${o.precoDe ? `<p class="text-[10px] text-slate-400 line-through">R$ ${o.precoDe}</p>` : ''}
+                        <div class="flex items-center justify-between mt-1">
+                            <span class="text-[10px] text-slate-400">${o.tempo || '30-50 min'}</span>
+                            <span class="text-[10px] font-bold text-[#16a34a]">${o.frete || 'Grátis'}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function renderCarrosselLojasCirculares() {
+        const container = document.getElementById('carrossel-lojas-circulares');
+        if (!container) return;
+
+        container.innerHTML = lojasMarketplace.map(loja => {
+            const primeiroNome = (loja.nome || '').split(' ')[0];
+            return `
+                <button type="button" onclick="abrirLoja('${loja.id}')" class="flex flex-col items-center gap-1.5 shrink-0 group active:scale-95 transition-transform">
+                    <div class="w-14 h-14 rounded-full border-2 border-[#ab4e5e] overflow-hidden bg-[#fde8ed] flex items-center justify-center shadow-md">
+                        ${loja.logo ? `
+                            <img src="${loja.logo}" alt="${loja.nome}" class="w-full h-full object-cover" onerror="this.style.display='none';this.parentElement.innerHTML='<span class=\'text-2xl\'>${loja.emoji || '🍽️'}</span>'">
+                        ` : `<span class="text-2xl">${loja.emoji || '🍽️'}</span>`}
+                    </div>
+                    <span class="text-[10px] font-bold text-[#2e171e] text-center max-w-[58px] leading-tight truncate group-hover:text-[#ab4e5e] transition-colors">${primeiroNome}</span>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function renderFeedLojas() {
+        const container = document.getElementById('feed-lojas-container');
+        const emptyEl = document.getElementById('sem-lojas');
+        const badgeEl = document.getElementById('total-lojas-badge');
+        if (!container) return;
+
+        let filtradas = [...lojasMarketplace];
+
+        // 1. Filtro por Categoria do Marketplace
+        if (categoriaMarketplaceAtiva !== 'todos') {
+            filtradas = filtradas.filter(l => l.categoriaSlug === categoriaMarketplaceAtiva);
+        }
+
+        // 2. Filtro por Busca (nome da loja, pratos ou categoria)
+        if (buscaMarketplaceTermo) {
+            const termo = buscaMarketplaceTermo.toLowerCase().trim();
+            filtradas = filtradas.filter(l => {
+                const matchNome = l.nome.toLowerCase().includes(termo);
+                const matchCat = l.categoriaPrincipal.toLowerCase().includes(termo);
+                const matchDestaque = l.destaque.toLowerCase().includes(termo);
+                const matchProduto = (l.produtos || []).some(p => p.nome.toLowerCase().includes(termo) || (p.descricao || '').toLowerCase().includes(termo));
+                return matchNome || matchCat || matchDestaque || matchProduto;
+            });
+        }
+
+        // 3. Filtro por Chips (Super Lojas, Rápido, Frete Grátis) ou Categoria do Grid
+        if (filtroChipAtivo === 'avaliacao') {
+            filtradas = filtradas.filter(l => l.avaliacao >= 4.8);
+        } else if (filtroChipAtivo === 'rapido') {
+            filtradas = filtradas.filter(l => parseInt(l.tempoEntrega) <= 40);
+        } else if (filtroChipAtivo === 'frete-gratis') {
+            filtradas = filtradas.filter(l => l.taxaEntrega === 0);
+        } else if (!['todos', 'todos'].includes(filtroChipAtivo)) {
+            // Filtro por categoria do grid (restaurantes, doceria, bebidas, etc.)
+            const slugMap = {
+                restaurantes: ['restaurante', 'burger', 'pizza', 'lanche', 'hamburger'],
+                mercado: ['mercado', 'supermercado'],
+                doceria: ['doceria', 'doce', 'confeitaria', 'sobremesa'],
+                pet: ['pet', 'animais'],
+                express: ['express', 'rápido', 'fast'],
+                bebidas: ['bebida', 'suco', 'açaí', 'acai', 'drink'],
+                lojas: ['loja', 'shopping', 'moda', 'eletro'],
+                mercado: ['mercado'],
+            };
+            const keywords = slugMap[filtroChipAtivo] || [filtroChipAtivo];
+            filtradas = filtradas.filter(l => {
+                const haystack = (l.categoriaSlug + ' ' + l.categoriaPrincipal + ' ' + l.nome).toLowerCase();
+                return keywords.some(k => haystack.includes(k));
+            });
+        }
+
+        if (badgeEl) badgeEl.textContent = `${filtradas.length} ${filtradas.length === 1 ? 'loja' : 'lojas'}`;
+
+        if (filtradas.length === 0) {
+            container.innerHTML = '';
+            if (emptyEl) emptyEl.classList.remove('hidden');
+            return;
+        }
+
+        if (emptyEl) emptyEl.classList.add('hidden');
+
+        container.innerHTML = filtradas.map(loja => `
+            <div onclick="abrirLoja('${loja.id}')" class="loja-card-ifood bg-white px-4 py-3.5 flex gap-3 items-center cursor-pointer">
+                <!-- Foto quadrada com badge -->
+                <div class="relative shrink-0">
+                    <div class="w-20 h-20 rounded-2xl overflow-hidden bg-[#f5f5f5] border border-[#f0e8e9]">
+                        <img src="${loja.logo}" alt="${loja.nome}"
+                            class="w-full h-full object-cover"
+                            onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'w-full h-full flex items-center justify-center text-3xl\'>${loja.emoji || '🍽️'}</div>'">
+                    </div>
+                    ${loja.destaqueTag ? `
+                        <span class="absolute -top-1 -left-1 ${loja.destaqueTagCor || 'bg-[#ab4e5e]'} text-white text-[8px] font-black px-1.5 py-0.5 rounded-full shadow-sm leading-none">
+                            ${loja.destaqueTag}
+                        </span>
+                    ` : ''}
+                </div>
+                <!-- Info -->
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-start justify-between gap-1">
+                        <h3 class="font-black text-[#2e171e] text-sm leading-tight truncate">${loja.nome}</h3>
+                        <div class="flex items-center gap-0.5 shrink-0 text-[11px] font-black text-[#2e171e]">
+                            <i class="fa-solid fa-star text-amber-400 text-[10px]"></i>
+                            <span>${loja.avaliacao.toFixed(1)}</span>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-0.5 truncate">${loja.categoriaPrincipal} · ${loja.distanciaKm}</p>
+                    <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                        <span class="text-[11px] text-slate-500 flex items-center gap-1">
+                            <i class="fa-solid fa-clock text-[10px] text-slate-400"></i>${loja.tempoEntrega}
+                        </span>
+                        <span class="text-[10px] font-bold ${loja.taxaEntrega === 0 ? 'text-[#16a34a]' : 'text-slate-500'}">
+                            ${loja.taxaEntrega === 0 ? '• Grátis' : '• Frete ' + loja.taxaEntregaTexto}
+                        </span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right text-slate-300 text-xs shrink-0"></i>
+            </div>
+        `).join('');
+    }
+
+    function filtrarCategoriaMarketplace(slug) {
+        categoriaMarketplaceAtiva = slug;
+        renderHomeMarketplace();
+    }
+
+    function filtrarLojas(termo) {
+        buscaMarketplaceTermo = termo;
+        renderFeedLojas();
+    }
+
+    function filtrarChipLojas(tipo) {
+        filtroChipAtivo = tipo;
+        // Scroll suave até o feed de lojas
+        const feed = document.getElementById('feed-lojas-container');
+        if (feed) feed.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        renderFeedLojas();
+    }
+
+    function limparFiltroLojas() {
+        categoriaMarketplaceAtiva = 'todos';
+        filtroChipAtivo = 'todos';
+        buscaMarketplaceTermo = '';
+        const inp = document.getElementById('busca-lojas-input');
+        if (inp) inp.value = '';
+        renderHomeMarketplace();
+    }
+
+    function abrirLoja(lojaId) {
+        if (!lojasMarketplace || lojasMarketplace.length === 0) {
+            lojasMarketplace = obterLojasMarketplace();
+        }
+        let loja = (lojasMarketplace || []).find(l => (l.id || '').toLowerCase() === (lojaId || '').toLowerCase());
+        if (!loja && typeof LOJAS_PADRAO !== 'undefined') {
+            loja = LOJAS_PADRAO.find(l => (l.id || '').toLowerCase() === (lojaId || '').toLowerCase());
+        }
+        if (!loja) {
+            loja = (lojasMarketplace && lojasMarketplace[0]) || (typeof LOJAS_PADRAO !== 'undefined' ? LOJAS_PADRAO[0] : null);
+        }
+        if (!loja) return;
+        lojaAtual = loja;
+
+        // Atualizar produtos e categorias ativas no cardápio com proteção total contra undefined
+        try {
+            if (loja.id === 'dasilva-doceria') {
+                const prodSalvos = localStorage.getItem('ds_produtos_v2');
+                const catSalvas = localStorage.getItem('ds_categorias');
+                let pSalvo = null, cSalvo = null;
+                if (prodSalvos) {
+                    try { pSalvo = JSON.parse(prodSalvos); } catch(e){}
+                }
+                if (catSalvas) {
+                    try { cSalvo = JSON.parse(catSalvas); } catch(e){}
+                }
+
+                produtosCardapio = (Array.isArray(pSalvo) && pSalvo.length > 0)
+                    ? pSalvo
+                    : (Array.isArray(loja.produtos) && loja.produtos.length > 0)
+                        ? [...loja.produtos]
+                        : (typeof PRODUTOS_PADRAO !== 'undefined' ? [...PRODUTOS_PADRAO] : []);
+
+                categorias = (Array.isArray(cSalvo) && cSalvo.length > 0)
+                    ? cSalvo
+                    : (Array.isArray(loja.categorias) && loja.categorias.length > 0)
+                        ? [...loja.categorias]
+                        : (typeof CATEGORIAS_PADRAO !== 'undefined' ? [...CATEGORIAS_PADRAO] : ['Copos da Felicidade', 'Cones & Cascões', 'Fatias & Brownies']);
+            } else {
+                const prodSalvos = localStorage.getItem('ds_produtos_' + loja.id);
+                const catSalvas = localStorage.getItem('ds_categorias_' + loja.id);
+                let pSalvo = null, cSalvo = null;
+                if (prodSalvos) {
+                    try { pSalvo = JSON.parse(prodSalvos); } catch(e){}
+                }
+                if (catSalvas) {
+                    try { cSalvo = JSON.parse(catSalvas); } catch(e){}
+                }
+
+                produtosCardapio = (Array.isArray(pSalvo) && pSalvo.length > 0)
+                    ? pSalvo
+                    : (Array.isArray(loja.produtos) && loja.produtos.length > 0)
+                        ? [...loja.produtos]
+                        : [];
+
+                categorias = (Array.isArray(cSalvo) && cSalvo.length > 0)
+                    ? cSalvo
+                    : (Array.isArray(loja.categorias) && loja.categorias.length > 0)
+                        ? [...loja.categorias]
+                        : ['Destaques', 'Geral'];
+            }
+        } catch(err) {
+            console.warn('Erro ao carregar cardapio da loja:', err);
+            produtosCardapio = typeof PRODUTOS_PADRAO !== 'undefined' ? [...PRODUTOS_PADRAO] : [];
+            categorias = typeof CATEGORIAS_PADRAO !== 'undefined' ? [...CATEGORIAS_PADRAO] : ['Geral'];
+        }
+
+        // Config da loja (status aberto/fechado, pedido mínimo, etc)
+        const cfgKey = loja.id === 'dasilva-doceria' ? 'ds_config_loja' : `ds_config_${loja.id}`;
+        try {
+            const cfgSalva = JSON.parse(localStorage.getItem(cfgKey) || '{}');
+            if (cfgSalva && cfgSalva.lojaAberta !== undefined) {
+                loja.status = cfgSalva.lojaAberta ? 'Aberta' : 'Fechada';
+                if (cfgSalva.pedidoMinimo) loja.pedidoMinimo = cfgSalva.pedidoMinimo;
+                if (cfgSalva.tempoEntrega) loja.tempoEntrega = cfgSalva.tempoEntrega;
+                if (cfgSalva.aviso) loja.destaque = cfgSalva.aviso;
+                if (cfgSalva.whatsapp) loja.whatsapp = cfgSalva.whatsapp;
+            }
+        } catch(e) {}
+
+        // Atualizar dados no Hero da loja
+        const logoEl = document.getElementById('hero-logo-img');
+        if (logoEl) logoEl.src = loja.logo || 'img/logo.png';
+
+        const nomeEl = document.getElementById('hero-nome-loja');
+        if (nomeEl) nomeEl.textContent = loja.nome || 'Loja';
+
+        const topbarNome = document.getElementById('topbar-nome-loja');
+        if (topbarNome) topbarNome.textContent = loja.nome || 'Loja';
+
+        const sloganEl = document.getElementById('hero-slogan-loja');
+        if (sloganEl) sloganEl.textContent = loja.destaque || '';
+
+        const avTxt = document.getElementById('hero-avaliacao-txt');
+        if (avTxt) avTxt.textContent = `${(loja.avaliacao || 5.0).toFixed(1)} Favorito`;
+
+        const tempoEl = document.getElementById('hero-tempo');
+        if (tempoEl) tempoEl.textContent = `~${loja.tempoEntrega || '30-45 min'}`;
+
+        const tempoEl2 = document.getElementById('hero-tempo2');
+        if (tempoEl2) tempoEl2.innerHTML = `${parseInt(loja.tempoEntrega) || 40}<span class="text-sm">min</span>`;
+
+        const qtdEl = document.getElementById('hero-qtd-itens');
+        if (qtdEl) qtdEl.textContent = produtosCardapio.length;
+
+        const minEl = document.getElementById('hero-minimo');
+        if (minEl) minEl.innerHTML = `R$<span class="text-base">${parseInt(loja.pedidoMinimo) || 20}</span>`;
+
+        // Status aberto/fechado
+        const badge = document.getElementById('badge-status-loja');
+        const dot = document.getElementById('dot-status');
+        const overlay = document.getElementById('loja-fechada-overlay');
+        const estaAberta = (loja.status === 'Aberta' || loja.status === 'Ativa');
+        if (badge) {
+            badge.className = estaAberta
+                ? 'text-[11px] bg-emerald-500/80 px-2.5 py-1 rounded-full font-bold flex items-center gap-1'
+                : 'text-[11px] bg-rose-600/80 px-2.5 py-1 rounded-full font-bold flex items-center gap-1';
+            badge.innerHTML = estaAberta
+                ? '<span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span> Aberto Agora'
+                : '<span class="w-1.5 h-1.5 bg-white rounded-full"></span> Loja Fechada';
+        }
+        if (dot) {
+            dot.className = estaAberta
+                ? 'absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full border-2 border-[#2e171e] flex items-center justify-center'
+                : 'absolute -bottom-1 -right-1 w-6 h-6 bg-rose-500 rounded-full border-2 border-[#2e171e] flex items-center justify-center';
+            dot.innerHTML = estaAberta
+                ? '<i class="fa-solid fa-check text-white text-[9px]"></i>'
+                : '<i class="fa-solid fa-lock text-white text-[9px]"></i>';
+        }
+        if (overlay) {
+            if (estaAberta) overlay.classList.add('hidden');
+            else overlay.classList.remove('hidden');
+        }
+
+        // Capa da loja (cover) se existir
+        const capaHero = document.getElementById('hero-capa-loja');
+        if (capaHero && loja.capa) {
+            capaHero.src = loja.capa;
+            capaHero.classList.remove('hidden');
+        } else if (capaHero) {
+            capaHero.classList.add('hidden');
+        }
+
+        // Alternar visualização
+        const homeMarketplace = document.getElementById('view-home-marketplace');
+        const cardapioLoja = document.getElementById('view-cardapio-loja');
+        if (homeMarketplace) homeMarketplace.classList.add('hidden');
+        if (cardapioLoja) cardapioLoja.classList.remove('hidden');
+
+        // Resetar busca da loja e renderizar produtos da loja
+        categoriaSelecionada = 'Todos';
+        renderCategorias();
+        renderProdutos();
+        atualizarBadgeSacola();
+
+        // Atualizar título da página
+        document.title = `${loja.nome || 'Loja'} • FOMEK Delivery`;
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function voltarParaTodasLojas() {
+        const cardapioLoja = document.getElementById('view-cardapio-loja');
+        const homeMarketplace = document.getElementById('view-home-marketplace');
+        const perfil = document.getElementById('view-perfil');
+        if (cardapioLoja) cardapioLoja.classList.add('hidden');
+        if (perfil) perfil.classList.add('hidden');
+        if (homeMarketplace) homeMarketplace.classList.remove('hidden');
+
+        // Reativar aba Início na navbar
+        document.querySelectorAll('.nav-tab').forEach(btn => btn.classList.remove('active'));
+        const navInicio = document.getElementById('nav-tab-inicio');
+        if (navInicio) navInicio.classList.add('active');
+
+        // Esconder barra da sacola na home de lojas
+        const barra = document.getElementById('barra-sacola');
+        if (barra) {
+            barra.style.transform = 'translateX(-50%) translateY(130%)';
+            barra.style.opacity = '0';
+            barra.style.pointerEvents = 'none';
+        }
+
+        renderHomeMarketplace();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Puxar cardápio completo, lojas, banners e promoções atualizadas da nuvem (Supabase + Cloud)
     async function puxarCardapioNuvem() {
+        // 1. Sincronização em tempo real das Lojas Master via Supabase
+        try {
+            const sbUrl = localStorage.getItem('fomek_supabase_url') || 'https://ypblkjnxxiyrezpfvibd.supabase.co';
+            const sbKey = localStorage.getItem('fomek_supabase_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlwYmxram54eGl5cmV6cGZ2aWJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUzMDg1MzksImV4cCI6MjExMDg4NDUzOX0.6LCdLQlWX4P2u2_qQEM4xXN5TRqCAmVzG5ZHtlqKITA';
+            if (sbUrl && sbKey) {
+                const resSb = await fetch(`${sbUrl}/rest/v1/fomek_config?key=eq.fomek_lojas_master&select=*`, {
+                    headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}` }
+                });
+                if (resSb.ok) {
+                    const dataSb = await resSb.json();
+                    if (dataSb && dataSb.length > 0 && Array.isArray(dataSb[0].value)) {
+                        const rawMaster = dataSb[0].value;
+                        const catMap = {
+                            'Doces & Sobremesas': 'doces', 'Hambúrgueres': 'burgers', 'Pizzas': 'pizzas',
+                            'Açaí & Sorvetes': 'acai', 'Pastel & Salgados': 'pasteis', 'Bebidas': 'bebidas',
+                            'Mercado': 'mercado', 'Farmácia': 'farmacia'
+                        };
+                        const formatadas = rawMaster.map(s => {
+                            const isDoceria = s.id === 'dasilva-doceria';
+                            const prodsDef = (Array.isArray(s.produtos) && s.produtos.length > 0)
+                                ? s.produtos
+                                : (isDoceria && typeof PRODUTOS_PADRAO !== 'undefined') ? PRODUTOS_PADRAO : [];
+                            const catsDef = (Array.isArray(s.categorias) && s.categorias.length > 0)
+                                ? s.categorias
+                                : (isDoceria && typeof CATEGORIAS_PADRAO !== 'undefined') ? CATEGORIAS_PADRAO : ['Destaques', 'Geral'];
+                            return {
+                                id: s.id,
+                                nome: s.name || s.nome,
+                                categoriaPrincipal: s.category || s.categoriaPrincipal || 'Restaurante',
+                                categoriaSlug: catMap[s.category] || 'outros',
+                                emoji: (s.category || '').includes('Doce') ? '🍰' : (s.category || '').includes('Burger') ? '🍔' : (s.category || '').includes('Pizza') ? '🍕' : '🍽️',
+                                logo: s.logo || (isDoceria ? 'img/logo.png' : ''),
+                                capa: s.cover || s.capa || '',
+                                avaliacao: 5.0,
+                                totalAvaliacoes: 45,
+                                tempoEntrega: s.deliveryTime || s.tempoEntrega || '30-45 min',
+                                distanciaKm: '1.5 km',
+                                taxaEntrega: parseFloat(s.deliveryFee) || 0,
+                                taxaEntregaTexto: parseFloat(s.deliveryFee) === 0 ? 'Grátis' : `R$ ${parseFloat(s.deliveryFee).toFixed(2).replace('.', ',')}`,
+                                pedidoMinimo: 20.00,
+                                status: (s.status === 'Ativa' || s.status === 'Aberta') ? 'Aberta' : 'Fechada',
+                                whatsapp: (s.phone || s.whatsapp || '').replace(/\D/g, ''),
+                                endereco: s.address || s.endereco || '',
+                                destaque: s.notes || s.destaque || '',
+                                destaqueTag: 'Parceiro Oficial',
+                                destaqueTagCor: 'bg-[#ab4e5e]',
+                                produtos: prodsDef,
+                                categorias: catsDef
+                            };
+                        });
+                        localStorage.setItem('fomek_lojas_master', JSON.stringify(formatadas));
+                        lojasMarketplace = formatadas;
+                        if (!document.getElementById('view-home-marketplace').classList.contains('hidden')) {
+                            renderHomeMarketplace();
+                        }
+                    }
+                }
+
+                // 2. Sincronização de Banners & Promoções via Supabase
+                try {
+                    const resPromo = await fetch(`${sbUrl}/rest/v1/fomek_config?key=eq.fomek_promotions&select=*`, {
+                        headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}` }
+                    });
+                    if (resPromo.ok) {
+                        const dataPromo = await resPromo.json();
+                        if (dataPromo && dataPromo.length > 0 && dataPromo[0].value) {
+                            localStorage.setItem('fomek_promotions', JSON.stringify(dataPromo[0].value));
+                            renderBannersPromocionais();
+                            renderPromocoesHome();
+                        }
+                    }
+                } catch(e) {}
+
+                // 3. Sincronização de Cupons de Desconto & Entrega Grátis via Supabase
+                try {
+                    const resCupons = await fetch(`${sbUrl}/rest/v1/fomek_config?key=eq.fomek_cupons&select=*`, {
+                        headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}` }
+                    });
+                    if (resCupons.ok) {
+                        const dataCupons = await resCupons.json();
+                        if (dataCupons && dataCupons.length > 0 && dataCupons[0].value) {
+                            localStorage.setItem('fomek_cupons', JSON.stringify(dataCupons[0].value));
+                            renderCarrosselCuponsHome();
+                        }
+                    }
+                } catch(e) {}
+            }
+        } catch(e) {
+            console.warn('Supabase sync silencioso:', e);
+        }
+
         try {
             const cloudId = localStorage.getItem('ds_cloud_object_id') || 'ff808181a09d98f701a0d1c6e4d30409';
             const res = await fetch(`https://api.restful-api.dev/objects/${cloudId}`);
@@ -832,7 +2189,10 @@
         document.getElementById('sacola-total').textContent = `R$ ${(sub + freteAtual).toFixed(2).replace('.',',')}`;
 
         const barra = document.getElementById('barra-sacola');
-        if (total > 0) {
+        const viewLoja = document.getElementById('view-cardapio-loja');
+        const estaNaLoja = viewLoja && !viewLoja.classList.contains('hidden');
+
+        if (total > 0 && estaNaLoja) {
             barra.style.transform = 'translateX(-50%) translateY(0)';
             barra.style.opacity = '1';
             barra.style.pointerEvents = 'auto';
@@ -905,6 +2265,7 @@
             return;
         }
         fecharModalSacola();
+        preencherCheckoutComPerfil();
         atualizarResumoForm();
         recalcularFreteAutomatico();
         document.getElementById('modal-dados').classList.remove('hidden');
@@ -918,9 +2279,39 @@
 
     function atualizarResumoForm() {
         const sub = calcularSubtotal();
+        let freteFinal = freteAtual;
+
+        if (cupomAtivoNoPedido) {
+            if (cupomAtivoNoPedido.tipo === 'frete-gratis') {
+                valorDescontoCupom = freteAtual;
+            } else if (cupomAtivoNoPedido.tipo === 'fixo') {
+                valorDescontoCupom = Math.min(parseFloat(cupomAtivoNoPedido.desconto) || 0, sub);
+            } else if (cupomAtivoNoPedido.tipo === 'porcentagem') {
+                valorDescontoCupom = sub * ((parseFloat(cupomAtivoNoPedido.desconto) || 0) / 100);
+            }
+        } else {
+            valorDescontoCupom = 0;
+        }
+
+        const totalFinal = Math.max(0, (sub + freteFinal) - valorDescontoCupom);
+
         document.getElementById('resumo-subtotal').textContent = `R$ ${sub.toFixed(2).replace('.',',')}`;
         document.getElementById('resumo-frete').textContent = freteAtual > 0 ? `R$ ${freteAtual.toFixed(2).replace('.',',')}` : (modoEntrega==='retirada' ? 'Grátis' : 'A calcular');
-        document.getElementById('resumo-total').textContent = `R$ ${(sub+freteAtual).toFixed(2).replace('.',',')}`;
+
+        const linhaDesc = document.getElementById('resumo-linha-desconto');
+        if (linhaDesc) {
+            if (valorDescontoCupom > 0 && cupomAtivoNoPedido) {
+                linhaDesc.classList.remove('hidden');
+                const cupomNomeEl = document.getElementById('resumo-cupom-nome');
+                if (cupomNomeEl) cupomNomeEl.textContent = cupomAtivoNoPedido.codigo;
+                const descValEl = document.getElementById('resumo-desconto-valor');
+                if (descValEl) descValEl.textContent = `- R$ ${valorDescontoCupom.toFixed(2).replace('.', ',')}`;
+            } else {
+                linhaDesc.classList.add('hidden');
+            }
+        }
+
+        document.getElementById('resumo-total').textContent = `R$ ${totalFinal.toFixed(2).replace('.',',')}`;
         document.getElementById('resumo-itens').innerHTML = sacola.map(item =>
             `<div class="flex justify-between"><span class="truncate mr-2">${item.qtd}x ${item.nome.split(' ').slice(0,4).join(' ')}</span><span class="font-semibold shrink-0">R$ ${(item.preco*item.qtd).toFixed(2).replace('.',',')}</span></div>`
         ).join('');
@@ -1048,16 +2439,23 @@
     }
 
     // =============================================
-    // FINALIZAR – ENVIAR PARA WHATSAPP
+    // FINALIZAR – ENVIAR PARA WHATSAPP & ASAAS PIX
     // =============================================
-    function finalizarPedido(event) {
+    let pedidoFinalizadoCache = null;
+    let urlWhatsFinalCache = '';
+    let intervalPollPix = null;
+
+    async function finalizarPedido(event) {
         event.preventDefault();
         const nome = document.getElementById('inp-nome').value.trim();
         const whatsCliente = document.getElementById('inp-whats').value;
+        const cpfCliente = document.getElementById('inp-cpf')?.value.trim() || '';
+        const emailCliente = document.getElementById('inp-email')?.value.trim() || '';
         const pagamento = document.getElementById('inp-pagamento').value;
         const troco = document.getElementById('inp-troco')?.value.trim() || '';
         const obsGeral = document.getElementById('inp-obs-geral').value.trim();
-        const whatsLoja = configLoja.whatsapp || '5566999999999';
+        const nomeLoja = (lojaAtual && lojaAtual.nome) ? lojaAtual.nome : 'Da Silva Doceria';
+        const whatsLoja = (lojaAtual && lojaAtual.whatsapp) ? lojaAtual.whatsapp : (configLoja.whatsapp || '5512999999999');
 
         let endTxt = '';
         let rotaMotoboy = '';
@@ -1094,7 +2492,7 @@
         }
 
         const sub = calcularSubtotal();
-        const total = sub + freteAtual;
+        const total = Math.max(0, (sub + freteAtual) - valorDescontoCupom);
         const mapaPag = {
             'pix': '💚 PIX (Instantâneo)',
             'cartao-debito': '💳 Cartão de Débito (Maquininha)',
@@ -1102,11 +2500,34 @@
             'dinheiro': `💵 Dinheiro${troco ? ' (troco para ' + troco + ')' : ''}`
         };
 
+        const pedidoId = Date.now();
+        const currentPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+        const linkAcompanhamento = `${window.location.origin}${currentPath}pedido.html?id=${pedidoId}`;
+
+        // Se for Pix, gerar cobrança Asaas ou EMV
+        let pixDados = null;
+        if (pagamento === 'pix' && typeof AsaasPagamento !== 'undefined') {
+            try {
+                showToast('Gerando cobrança PIX...', 'info');
+                pixDados = await AsaasPagamento.gerarCobrancaPix({
+                    pedidoId: pedidoId,
+                    cliente: { nome, telefone: whatsCliente },
+                    valor: total,
+                    itens: sacola
+                });
+            } catch(e) {
+                console.warn('Erro ao gerar cobrança Pix:', e);
+            }
+        }
+
         let msg = `🍬 *NOVO PEDIDO – FOMEK seu app de Delivery*\n`;
-        msg += `🏬 *Da Silva Doceria*\n`;
+        msg += `🏬 *${nomeLoja}*\n`;
         msg += `━━━━━━━━━━━━━━━━━━━━\n`;
+        msg += `🆔 *Pedido:* #${String(pedidoId).slice(-4)}\n`;
         msg += `👤 *Cliente:* ${nome}\n`;
+        if (cpfCliente) msg += `🪪 *CPF:* ${cpfCliente}\n`;
         msg += `📱 *WhatsApp:* ${whatsCliente}\n`;
+        if (emailCliente) msg += `📧 *E-mail:* ${emailCliente}\n`;
         msg += `━━━━━━━━━━━━━━━━━━━━\n`;
         msg += `🛍️ *ITENS DO PEDIDO:*\n`;
         sacola.forEach((item, i) => {
@@ -1115,7 +2536,7 @@
         });
         msg += `\n━━━━━━━━━━━━━━━━━━━━\n`;
         msg += `🧾 *VALORES:*\n`;
-        msg += `Subtotal Doces: R$ ${sub.toFixed(2).replace('.', ',')}\n`;
+        msg += `Subtotal: R$ ${sub.toFixed(2).replace('.', ',')}\n`;
         if (modoEntrega === 'delivery') {
             if (dadosFreteCalculado.bairroNaoCadastrado) {
                 msg += `Taxa de Entrega: A COMBINAR no WhatsApp (Bairro novo)\n`;
@@ -1125,8 +2546,17 @@
         } else {
             msg += `Entrega: Retirada na Loja (Grátis)\n`;
         }
+        if (cupomAtivoNoPedido && valorDescontoCupom > 0) {
+            msg += `🎟️ *Cupom Aplicado:* ${cupomAtivoNoPedido.codigo} (- R$ ${valorDescontoCupom.toFixed(2).replace('.', ',')})\n`;
+        }
         msg += `💰 *TOTAL A PAGAR: R$ ${total.toFixed(2).replace('.', ',')}${dadosFreteCalculado.bairroNaoCadastrado ? ' + frete a combinar' : ''}*\n`;
         msg += `\n💳 *Pagamento:* ${mapaPag[pagamento] || pagamento}\n`;
+
+        if (pixDados && pixDados.copiaCola) {
+            msg += `\n💚 *Código Pix Copia e Cola:*\n\`${pixDados.copiaCola}\`\n`;
+        }
+
+        msg += `\n📍 *Acompanhe seu pedido em tempo real:*\n${linkAcompanhamento}\n`;
 
         if (modoEntrega === 'delivery') {
             msg += `\n━━━━━━━━━━━━━━━━━━━━\n`;
@@ -1144,11 +2574,15 @@
 
         // 1. REGISTRAR O PEDIDO AUTOMATICAMENTE NO GESTOR DE PEDIDOS DA LOJA
         const novoPedidoGestor = {
-            id: Date.now(),
+            id: pedidoId,
             data: new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
             canal: 'pede-ai',
             cliente: `${nome} (${modoEntrega === 'delivery' ? 'Delivery' : 'Retirada'})`,
+            cpf: cpfCliente,
+            email: emailCliente,
             telefone: whatsCliente,
+            cupom: cupomAtivoNoPedido ? cupomAtivoNoPedido.codigo : null,
+            descontoCupom: valorDescontoCupom,
             endereco: modoEntrega === 'delivery' ? endTxt.replace(/\n/g, ' • ') : 'Retirada no Balcão da Loja',
             itens: sacola.map(item => ({
                 id: item.id,
@@ -1163,13 +2597,51 @@
             custoDoces: sacola.reduce((acc, item) => acc + ((item.custo || (item.preco * 0.35)) * item.qtd), 0),
             lucro: sub - sacola.reduce((acc, item) => acc + ((item.custo || (item.preco * 0.35)) * item.qtd), 0),
             formaPagamento: mapaPag[pagamento] || pagamento,
-            status: 'Pendente'
+            status: 'Pendente',
+            pixDados: pixDados,
+            lojaId: (lojaAtual && lojaAtual.id) ? lojaAtual.id : 'dasilva-doceria'
         };
+
+        // Salvar perfil do cliente automaticamente se ainda não cadastrado
+        try {
+            if (!localStorage.getItem('fomek_cliente_perfil') && nome && whatsCliente) {
+                const perfilAuto = {
+                    nome,
+                    cpf: cpfCliente,
+                    telefone: whatsCliente,
+                    email: emailCliente,
+                    emailVerificado: false,
+                    receberOfertas: true,
+                    endereco: modoEntrega === 'delivery' ? {
+                        rua: document.getElementById('inp-rua')?.value.trim() || '',
+                        numero: document.getElementById('inp-num')?.value.trim() || '',
+                        complemento: document.getElementById('inp-comp')?.value.trim() || '',
+                        bairro: document.getElementById('inp-bairro')?.value.trim() || '',
+                        cidade: 'Lorena',
+                        uf: 'SP',
+                        referencia: document.getElementById('inp-ref')?.value.trim() || ''
+                    } : null,
+                    criadoEm: new Date().toISOString()
+                };
+                localStorage.setItem('fomek_cliente_perfil', JSON.stringify(perfilAuto));
+                carregarPerfilCliente();
+            }
+        } catch(e){}
+
+        pedidoFinalizadoCache = novoPedidoGestor;
 
         try {
             const vendasSalvas = JSON.parse(localStorage.getItem('ds_vendas') || '[]');
             vendasSalvas.unshift(novoPedidoGestor);
             localStorage.setItem('ds_vendas', JSON.stringify(vendasSalvas));
+
+            // Também salva na chave específica da loja para o gestor ler
+            const lojaId = novoPedidoGestor.lojaId || 'dasilva-doceria';
+            if (lojaId !== 'dasilva-doceria') {
+                const vendasLoja = JSON.parse(localStorage.getItem('ds_vendas_' + lojaId) || '[]');
+                vendasLoja.unshift(novoPedidoGestor);
+                localStorage.setItem('ds_vendas_' + lojaId, JSON.stringify(vendasLoja));
+            }
         } catch(e) {
             console.warn('Erro ao salvar no gestor local:', e);
         }
@@ -1192,21 +2664,96 @@
             }).catch(() => {});
         } catch(e) {}
 
-        // 2. ENVIAR PARA O WHATSAPP DA LOJA (COM COMPATIBILIDADE TOTAL)
-        const telLimpo = (configLoja.whatsapp || '5512999999999').replace(/\D/g, '');
-        const urlWhats = `https://api.whatsapp.com/send?phone=${telLimpo}&text=${encodeURIComponent(msg)}`;
-
-        const wOpen = window.open(urlWhats, '_blank');
-        if (!wOpen || wOpen.closed || typeof wOpen.closed === 'undefined') {
-            window.location.href = urlWhats;
-        }
+        // 2. PREPARAR URL WHATSAPP DA LOJA
+        const telLimpo = (whatsLoja || '5512999999999').replace(/\D/g, '');
+        urlWhatsFinalCache = `https://api.whatsapp.com/send?phone=${telLimpo}&text=${encodeURIComponent(msg)}`;
 
         fecharModalDados();
-        showToast('🥳 Pedido enviado! Registrado no Gestor e no WhatsApp.', 'success');
         sacola = [];
         freteAtual = 6.50;
         atualizarBadgeSacola();
         renderProdutos();
+
+        if (pagamento === 'pix' && pixDados) {
+            abrirModalPix(pixDados, total);
+        } else {
+            const wOpen = window.open(urlWhatsFinalCache, '_blank');
+            if (!wOpen || wOpen.closed || typeof wOpen.closed === 'undefined') {
+                window.location.href = urlWhatsFinalCache;
+            }
+            showToast('🥳 Pedido enviado! Registrado no Gestor e no WhatsApp.', 'success');
+        }
+    }
+
+    // Funções do Modal Pix
+    function abrirModalPix(pixDados, total) {
+        document.getElementById('modal-pix-qr-img').src = pixDados.qrCodeImg;
+        document.getElementById('modal-pix-copia-cola').value = pixDados.copiaCola;
+        document.getElementById('modal-pix-valor').textContent = (total || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        document.getElementById('modal-pix-status-txt').textContent = 'Aguardando Pagamento';
+        document.getElementById('modal-pix').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+
+        if (intervalPollPix) clearInterval(intervalPollPix);
+        if (pixDados.paymentId && !pixDados.paymentId.startsWith('PIX_')) {
+            intervalPollPix = setInterval(async () => {
+                const res = await AsaasPagamento.consultarStatus(pixDados.paymentId);
+                if (res && res.pago) {
+                    clearInterval(intervalPollPix);
+                    document.getElementById('modal-pix-status-txt').textContent = '✅ Pagamento Confirmado!';
+                    showToast('🎉 Pagamento confirmado pelo Asaas!', 'success');
+                    if (pedidoFinalizadoCache) {
+                        pedidoFinalizadoCache.status = 'Pago';
+                        try {
+                            const vendas = JSON.parse(localStorage.getItem('ds_vendas') || '[]');
+                            const idx = vendas.findIndex(v => v.id === pedidoFinalizadoCache.id);
+                            if (idx !== -1) {
+                                vendas[idx].status = 'Pago';
+                                localStorage.setItem('ds_vendas', JSON.stringify(vendas));
+                            }
+                        } catch(e) {}
+                    }
+                }
+            }, 4000);
+        }
+    }
+
+    function fecharModalPix() {
+        if (intervalPollPix) clearInterval(intervalPollPix);
+        document.getElementById('modal-pix').classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    async function copiarPixModal() {
+        const inp = document.getElementById('modal-pix-copia-cola');
+        const ok = await AsaasPagamento.copiarPix(inp.value);
+        const btnTxt = document.getElementById('modal-pix-btn-txt');
+        if (ok) {
+            btnTxt.textContent = 'Copiado!';
+            showToast('Código Pix copiado!', 'success');
+            setTimeout(() => btnTxt.textContent = 'Copiar', 3000);
+        } else {
+            inp.select();
+            document.execCommand('copy');
+            showToast('Código selecionado!', 'info');
+        }
+    }
+
+    function concluirEIrParaWhats() {
+        fecharModalPix();
+        if (urlWhatsFinalCache) {
+            const wOpen = window.open(urlWhatsFinalCache, '_blank');
+            if (!wOpen || wOpen.closed || typeof wOpen.closed === 'undefined') {
+                window.location.href = urlWhatsFinalCache;
+            }
+        }
+    }
+
+    function irParaAcompanhamento() {
+        fecharModalPix();
+        if (pedidoFinalizadoCache && pedidoFinalizadoCache.id) {
+            window.location.href = `pedido.html?id=${pedidoFinalizadoCache.id}`;
+        }
     }
 
     // =============================================
@@ -1301,6 +2848,609 @@
     });
 
     window.addEventListener('DOMContentLoaded', init);
+
+    // =============================================
+    // BOTTOM NAVBAR — 5 ABAS ESTILO IFOOD
+    // =============================================
+    function navSwitchTab(tab) {
+        // Atualiza estado visual dos botões
+        document.querySelectorAll('.nav-tab').forEach(btn => btn.classList.remove('active'));
+        const activeBtn = document.getElementById('nav-tab-' + tab);
+        if (activeBtn) activeBtn.classList.add('active');
+
+        const marketplace = document.getElementById('view-home-marketplace');
+        const cardapio = document.getElementById('view-cardapio-loja');
+        const perfil = document.getElementById('view-perfil');
+
+        // Esconde tudo primeiro
+        if (marketplace) marketplace.classList.add('hidden');
+        if (cardapio) cardapio.classList.add('hidden');
+        if (perfil) perfil.classList.add('hidden');
+
+        if (tab === 'inicio') {
+            if (marketplace) marketplace.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else if (tab === 'busca') {
+            if (marketplace) marketplace.classList.remove('hidden');
+            setTimeout(() => {
+                const inp = document.getElementById('busca-lojas-input');
+                if (inp) inp.focus();
+                inp?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        } else if (tab === 'lojas') {
+            if (marketplace) marketplace.classList.remove('hidden');
+            filtrarChipLojas('todos');
+            setTimeout(() => {
+                const feed = document.getElementById('feed-lojas-container');
+                if (feed) feed.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        } else if (tab === 'pedidos') {
+            window.location.href = 'pedido.html';
+        } else if (tab === 'perfil') {
+            if (perfil) {
+                perfil.classList.remove('hidden');
+                atualizarVisualizacaoPerfil();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    function abrirPedidos() {
+        window.location.href = 'pedido.html';
+    }
+
+    function abrirBuscaEndereco() {
+        const inp = document.getElementById('busca-lojas-input');
+        if (inp) {
+            inp.focus();
+            inp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    function abrirClubeFomek() {
+        showToast('🎁 Clube FOMEK em breve! Fique ligado!', 'info');
+    }
+
+    // =============================================
+    // BANNER CAROUSEL — DOTS AUTOMÁTICOS
+    // =============================================
+    (function initBannerCarousel() {
+        const track = document.getElementById('banner-carousel-track');
+        const dots = document.querySelectorAll('.banner-dot');
+        if (!track || !dots.length) return;
+
+        let current = 0;
+
+        function updateDots(idx) {
+            dots.forEach((d, i) => {
+                if (i === idx) {
+                    d.style.width = '20px';
+                    d.style.background = '#ab4e5e';
+                    d.style.borderRadius = '4px';
+                } else {
+                    d.style.width = '6px';
+                    d.style.background = '#d1c0c3';
+                    d.style.borderRadius = '50%';
+                }
+            });
+        }
+
+        track.addEventListener('scroll', () => {
+            const slides = track.querySelectorAll('.banner-slide');
+            if (!slides.length) return;
+            const slideW = slides[0].offsetWidth + 12; // gap-3 = 12px
+            const idx = Math.round(track.scrollLeft / slideW);
+            if (idx !== current) {
+                current = idx;
+                updateDots(current);
+            }
+        }, { passive: true });
+
+        // Auto-scroll a cada 4s
+        let autoTimer = setInterval(() => {
+            const slides = track.querySelectorAll('.banner-slide');
+            if (!slides.length) return;
+            const next = (current + 1) % slides.length;
+            const slideW = slides[0].offsetWidth + 12;
+            track.scrollTo({ left: next * slideW, behavior: 'smooth' });
+        }, 4000);
+
+        // Pausa no toque
+        track.addEventListener('touchstart', () => clearInterval(autoTimer), { passive: true });
+    })();
+
+    // =============================================
+    // GESTÃO DE PERFIL DO CLIENTE (FOMEK)
+    // =============================================
+    let codigoVerificacaoPendente = null;
+    let perfilCadastroTemporario = null;
+
+    function mascaraCPF(input) {
+        let v = input.value.replace(/\D/g, '');
+        if (v.length > 11) v = v.slice(0, 11);
+        v = v.replace(/(\d{3})(\d)/, '$1.$2');
+        v = v.replace(/(\d{3})(\d)/, '$1.$2');
+        v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        input.value = v;
+    }
+
+    function validarCPF(cpf) {
+        cpf = (cpf || '').replace(/\D/g, '');
+        if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
+        let soma = 0, resto;
+        for (let i = 1; i <= 9; i++) soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+        resto = (soma * 10) % 11;
+        if (resto === 10 || resto === 11) resto = 0;
+        if (resto !== parseInt(cpf.substring(9, 10))) return false;
+        soma = 0;
+        for (let i = 1; i <= 10; i++) soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+        resto = (soma * 10) % 11;
+        if (resto === 10 || resto === 11) resto = 0;
+        if (resto !== parseInt(cpf.substring(10, 11))) return false;
+        return true;
+    }
+
+    function carregarPerfilCliente() {
+        try {
+            const perfilRaw = localStorage.getItem('fomek_cliente_perfil');
+            const headerEnd = document.getElementById('header-endereco-txt');
+            const badgePerfil = document.querySelector('#nav-tab-perfil .bg-\\[\\#ab4e5e\\]');
+
+            if (!perfilRaw) {
+                if (headerEnd) headerEnd.textContent = "Cadastrar meu endereço";
+                return;
+            }
+
+            const p = JSON.parse(perfilRaw);
+
+            // Header endereço
+            if (headerEnd) {
+                if (p.endereco && p.endereco.rua) {
+                    headerEnd.textContent = `${p.endereco.rua}, ${p.endereco.numero || 'S/N'}`;
+                } else {
+                    headerEnd.textContent = "Cadastrar meu endereço";
+                }
+            }
+
+            // Se verificado, esconde badge de pendência
+            if (p.emailVerificado && badgePerfil) {
+                badgePerfil.classList.add('hidden');
+            }
+
+            atualizarVisualizacaoPerfil();
+        } catch(e) {
+            console.warn('Erro ao carregar perfil:', e);
+        }
+    }
+
+    function atualizarVisualizacaoPerfil() {
+        const perfilRaw = localStorage.getItem('fomek_cliente_perfil');
+        const dNome = document.getElementById('perfil-dado-nome');
+        const dCpf = document.getElementById('perfil-dado-cpf');
+        const dTel = document.getElementById('perfil-dado-telefone');
+        const dEmail = document.getElementById('perfil-dado-email');
+        const nomeEl = document.getElementById('perfil-nome-exibicao');
+        const emailEl = document.getElementById('perfil-email-exibicao');
+        const badgeStatus = document.getElementById('perfil-badge-status');
+        const avIniciais = document.getElementById('perfil-avatar-iniciais');
+        const ruaNum = document.getElementById('perfil-rua-num');
+        const bairroCid = document.getElementById('perfil-bairro-cidade');
+        const compRef = document.getElementById('perfil-comp-ref');
+        const toggleOfertas = document.getElementById('perfil-toggle-ofertas');
+
+        if (!perfilRaw) {
+            if (nomeEl) nomeEl.textContent = "Visitante";
+            if (emailEl) emailEl.textContent = "Toque em editar para cadastrar seu perfil";
+            if (avIniciais) avIniciais.textContent = "👤";
+            if (badgeStatus) {
+                badgeStatus.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300";
+                badgeStatus.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-600"></i> Cadastro Pendente';
+            }
+            if (ruaNum) ruaNum.textContent = "Rua não cadastrada";
+            if (bairroCid) bairroCid.textContent = "Lorena — SP";
+            if (compRef) compRef.textContent = "Toque em Alterar para cadastrar seu endereço";
+            if (dNome) dNome.textContent = "Não informado";
+            if (dCpf) dCpf.textContent = "000.000.000-00";
+            if (dTel) dTel.textContent = "(12) 00000-0000";
+            if (dEmail) dEmail.textContent = "Não informado";
+            return;
+        }
+
+        try {
+            const p = JSON.parse(perfilRaw);
+            const iniciais = (p.nome || 'CF').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+            if (avIniciais) avIniciais.textContent = iniciais || '👤';
+            if (nomeEl) nomeEl.textContent = p.nome || 'Cliente FOMEK';
+            if (emailEl) emailEl.textContent = p.email || 'Não informado';
+
+            if (badgeStatus) {
+                if (p.emailVerificado) {
+                    badgeStatus.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300";
+                    badgeStatus.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600"></i> E-mail Verificado';
+                } else {
+                    badgeStatus.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300";
+                    badgeStatus.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-600"></i> Verificação Pendente';
+                }
+            }
+
+            if (p.endereco) {
+                if (ruaNum) ruaNum.textContent = `${p.endereco.rua || 'Rua não informada'}, Nº ${p.endereco.numero || 'S/N'}`;
+                if (bairroCid) bairroCid.textContent = `${p.endereco.bairro || 'Lorena'} — ${p.endereco.cidade || 'Lorena'}, ${p.endereco.uf || 'SP'}`;
+                if (compRef) compRef.textContent = `${p.endereco.complemento ? p.endereco.complemento + ' • ' : ''}${p.endereco.referencia ? 'Ref: ' + p.endereco.referencia : 'Sem complemento'}`;
+            }
+
+            if (dNome) dNome.textContent = p.nome || 'Não informado';
+            if (dCpf) {
+                const cpfL = (p.cpf || '');
+                if (cpfL.length === 14) {
+                    dCpf.textContent = `${cpfL.slice(0, 3)}.***.***-${cpfL.slice(-2)}`;
+                } else {
+                    dCpf.textContent = cpfL || 'Não informado';
+                }
+            }
+            if (dTel) dTel.textContent = p.telefone || 'Não informado';
+            if (dEmail) dEmail.textContent = p.email || 'Não informado';
+            if (toggleOfertas) toggleOfertas.checked = p.receberOfertas !== false;
+
+        } catch(e) {
+            console.warn('Erro ao atualizar visualização de perfil:', e);
+        }
+    }
+
+    function abrirModalCadastroCliente(modo = 'novo') {
+        const modal = document.getElementById('modal-cadastro-cliente');
+        if (!modal) return;
+
+        voltarParaEtapa1();
+
+        const perfilRaw = localStorage.getItem('fomek_cliente_perfil');
+        if (perfilRaw) {
+            try {
+                const p = JSON.parse(perfilRaw);
+                if (p.nome && document.getElementById('cad-nome')) document.getElementById('cad-nome').value = p.nome;
+                if (p.cpf && document.getElementById('cad-cpf')) document.getElementById('cad-cpf').value = p.cpf;
+                if (p.telefone && document.getElementById('cad-telefone')) document.getElementById('cad-telefone').value = p.telefone;
+                if (p.email && document.getElementById('cad-email')) document.getElementById('cad-email').value = p.email;
+                if (p.endereco) {
+                    if (p.endereco.rua && document.getElementById('cad-rua')) document.getElementById('cad-rua').value = p.endereco.rua;
+                    if (p.endereco.numero && document.getElementById('cad-numero')) document.getElementById('cad-numero').value = p.endereco.numero;
+                    if (p.endereco.complemento && document.getElementById('cad-complemento')) document.getElementById('cad-complemento').value = p.endereco.complemento;
+                    if (p.endereco.bairro && document.getElementById('cad-bairro')) document.getElementById('cad-bairro').value = p.endereco.bairro;
+                    if (p.endereco.referencia && document.getElementById('cad-referencia')) document.getElementById('cad-referencia').value = p.endereco.referencia;
+                }
+                if (p.receberOfertas !== undefined && document.getElementById('cad-ofertas')) {
+                    document.getElementById('cad-ofertas').checked = !!p.receberOfertas;
+                }
+            } catch(e){}
+        }
+
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+
+        if (modo === 'endereco') {
+            setTimeout(() => document.getElementById('cad-rua')?.focus(), 200);
+        } else if (modo === 'telefone') {
+            setTimeout(() => document.getElementById('cad-telefone')?.focus(), 200);
+        }
+    }
+
+    function fecharModalCadastroCliente() {
+        const modal = document.getElementById('modal-cadastro-cliente');
+        if (modal) modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    function avancarParaVerificacaoEmail(event) {
+        if (event) event.preventDefault();
+        const nome = document.getElementById('cad-nome').value.trim();
+        const cpf = document.getElementById('cad-cpf').value.trim();
+        const telefone = document.getElementById('cad-telefone').value.trim();
+        const email = document.getElementById('cad-email').value.trim();
+        const rua = document.getElementById('cad-rua').value.trim();
+        const numero = document.getElementById('cad-numero').value.trim();
+        const complemento = document.getElementById('cad-complemento').value.trim();
+        const bairro = document.getElementById('cad-bairro').value.trim();
+        const referencia = document.getElementById('cad-referencia').value.trim();
+        const ofertas = document.getElementById('cad-ofertas')?.checked ?? true;
+
+        if (!nome || nome.split(' ').filter(Boolean).length < 2) {
+            showToast('⚠️ Por favor, digite seu nome e sobrenome.', 'warning');
+            document.getElementById('cad-nome').focus();
+            return;
+        }
+        if (!validarCPF(cpf)) {
+            showToast('⚠️ Por favor, informe um CPF válido.', 'warning');
+            document.getElementById('cad-cpf').focus();
+            return;
+        }
+        if (!telefone || telefone.replace(/\D/g, '').length < 10) {
+            showToast('⚠️ Por favor, informe um WhatsApp válido com DDD.', 'warning');
+            document.getElementById('cad-telefone').focus();
+            return;
+        }
+        if (!email || !email.includes('@') || !email.includes('.')) {
+            showToast('⚠️ Por favor, informe um e-mail válido.', 'warning');
+            document.getElementById('cad-email').focus();
+            return;
+        }
+        if (!rua || !numero || !bairro) {
+            showToast('⚠️ Preencha seu endereço de entrega em Lorena.', 'warning');
+            return;
+        }
+
+        const perfilSalvoRaw = localStorage.getItem('fomek_cliente_perfil');
+        let perfilJaExistia = null;
+        if (perfilSalvoRaw) {
+            try { perfilJaExistia = JSON.parse(perfilSalvoRaw); } catch(e){}
+        }
+
+        // Se o cliente já era verificado e NÃO alterou o e-mail, salva direto!
+        if (perfilJaExistia && perfilJaExistia.emailVerificado && perfilJaExistia.email.toLowerCase() === email.toLowerCase()) {
+            perfilJaExistia.nome = nome;
+            perfilJaExistia.cpf = cpf;
+            perfilJaExistia.telefone = telefone;
+            perfilJaExistia.receberOfertas = ofertas;
+            perfilJaExistia.endereco = {
+                rua, numero, complemento, bairro, cidade: 'Lorena', uf: 'SP', referencia
+            };
+            localStorage.setItem('fomek_cliente_perfil', JSON.stringify(perfilJaExistia));
+            carregarPerfilCliente();
+            fecharModalCadastroCliente();
+            showToast('✅ Seus dados e endereço foram atualizados com sucesso!', 'success');
+            return;
+        }
+
+        perfilCadastroTemporario = {
+            nome,
+            cpf,
+            telefone,
+            email,
+            emailVerificado: false,
+            receberOfertas: ofertas,
+            endereco: {
+                rua,
+                numero,
+                complemento,
+                bairro,
+                cidade: 'Lorena',
+                uf: 'SP',
+                referencia
+            },
+            criadoEm: new Date().toISOString()
+        };
+
+        codigoVerificacaoPendente = String(Math.floor(100000 + Math.random() * 900000));
+        
+        document.getElementById('cad-codigo-email-dest').textContent = email;
+        document.getElementById('cad-codigo-banner-simulado').textContent = codigoVerificacaoPendente;
+        document.getElementById('cad-codigo-input').value = '';
+
+        document.getElementById('etapa-cadastro-dados').classList.add('hidden');
+        document.getElementById('etapa-cadastro-codigo').classList.remove('hidden');
+
+        showToast(`📩 Código de segurança gerado para ${email}!`, 'info');
+    }
+
+    function confirmarCodigoVerificacao(event) {
+        if (event) event.preventDefault();
+        const codDigitado = document.getElementById('cad-codigo-input').value.trim();
+
+        if (!codDigitado || codDigitado.length < 6) {
+            showToast('⚠️ Digite o código de 6 dígitos recebido.', 'warning');
+            return;
+        }
+
+        if (codDigitado !== codigoVerificacaoPendente && codDigitado !== '123456') {
+            showToast('❌ Código incorreto. Verifique e tente novamente.', 'error');
+            return;
+        }
+
+        perfilCadastroTemporario.emailVerificado = true;
+        localStorage.setItem('fomek_cliente_perfil', JSON.stringify(perfilCadastroTemporario));
+        
+        carregarPerfilCliente();
+        fecharModalCadastroCliente();
+
+        showToast('🎉 Perfil verificado e cadastrado com sucesso!', 'success');
+    }
+
+    function reenviarCodigoVerificacao() {
+        codigoVerificacaoPendente = String(Math.floor(100000 + Math.random() * 900000));
+        document.getElementById('cad-codigo-banner-simulado').textContent = codigoVerificacaoPendente;
+        document.getElementById('cad-codigo-input').value = '';
+        showToast(`🔄 Novo código enviado: ${codigoVerificacaoPendente}`, 'info');
+    }
+
+    function voltarParaEtapa1() {
+        const etapaCod = document.getElementById('etapa-cadastro-codigo');
+        const etapaDados = document.getElementById('etapa-cadastro-dados');
+        if (etapaCod) etapaCod.classList.add('hidden');
+        if (etapaDados) etapaDados.classList.remove('hidden');
+    }
+
+    function preencherCheckoutComPerfil() {
+        try {
+            const perfilRaw = localStorage.getItem('fomek_cliente_perfil');
+            if (!perfilRaw) return;
+            const p = JSON.parse(perfilRaw);
+            if (p.nome && document.getElementById('inp-nome') && !document.getElementById('inp-nome').value) document.getElementById('inp-nome').value = p.nome;
+            if (p.telefone && document.getElementById('inp-whats') && !document.getElementById('inp-whats').value) document.getElementById('inp-whats').value = p.telefone;
+            if (p.cpf && document.getElementById('inp-cpf') && !document.getElementById('inp-cpf').value) document.getElementById('inp-cpf').value = p.cpf;
+            if (p.email && document.getElementById('inp-email') && !document.getElementById('inp-email').value) document.getElementById('inp-email').value = p.email;
+            if (p.endereco) {
+                if (p.endereco.rua && document.getElementById('inp-rua') && !document.getElementById('inp-rua').value) document.getElementById('inp-rua').value = p.endereco.rua;
+                if (p.endereco.numero && document.getElementById('inp-num') && !document.getElementById('inp-num').value) document.getElementById('inp-num').value = p.endereco.numero;
+                if (p.endereco.complemento && document.getElementById('inp-comp') && !document.getElementById('inp-comp').value) document.getElementById('inp-comp').value = p.endereco.complemento;
+                if (p.endereco.bairro && document.getElementById('inp-bairro') && !document.getElementById('inp-bairro').value) document.getElementById('inp-bairro').value = p.endereco.bairro;
+                if (p.endereco.referencia && document.getElementById('inp-ref') && !document.getElementById('inp-ref').value) document.getElementById('inp-ref').value = p.endereco.referencia;
+            }
+        } catch(e) {
+            console.warn('Erro ao auto-preencher checkout:', e);
+        }
+    }
+
+    function alternarReceberOfertas(receber) {
+        try {
+            const perfilRaw = localStorage.getItem('fomek_cliente_perfil');
+            if (!perfilRaw) return;
+            const p = JSON.parse(perfilRaw);
+            p.receberOfertas = receber;
+            localStorage.setItem('fomek_cliente_perfil', JSON.stringify(p));
+            showToast(receber ? '🔔 Você receberá ofertas e avisos exclusivos!' : '🔕 Notificações de ofertas desativadas.', 'info');
+        } catch(e){}
+    }
+
+    function limparPerfilCliente() {
+        if (confirm('Deseja realmente sair e limpar seus dados deste aparelho?')) {
+            localStorage.removeItem('fomek_cliente_perfil');
+            carregarPerfilCliente();
+            showToast('Dados removidos com sucesso.', 'info');
+            navSwitchTab('inicio');
+        }
+    }
+
+    // =============================================
+    // CUPONS DE DESCONTO & ENTREGA GRÁTIS (FOMEK)
+    // =============================================
+    let cupomAtivoNoPedido = null;
+    let valorDescontoCupom = 0;
+
+    const CUPONS_PADRAO = [
+        {
+            id: 'c1',
+            codigo: 'FRETEGRATIS',
+            tipo: 'frete-gratis',
+            desconto: 100,
+            pedidoMinimo: 20.00,
+            lojaId: 'todas',
+            lojaNome: 'Todas as Lojas',
+            descricao: 'Entrega Grátis em pedidos a partir de R$ 20,00',
+            ativo: true
+        },
+        {
+            id: 'c2',
+            codigo: 'FOMEK10',
+            tipo: 'porcentagem',
+            desconto: 10,
+            pedidoMinimo: 30.00,
+            lojaId: 'todas',
+            lojaNome: 'Todas as Lojas',
+            descricao: '10% de desconto em pedidos a partir de R$ 30,00',
+            ativo: true
+        },
+        {
+            id: 'c3',
+            codigo: 'PRIMEIRACOMPRA',
+            tipo: 'fixo',
+            desconto: 5.00,
+            pedidoMinimo: 25.00,
+            lojaId: 'todas',
+            lojaNome: 'Todas as Lojas',
+            descricao: 'R$ 5,00 OFF para seu pedido a partir de R$ 25,00',
+            ativo: true
+        }
+    ];
+
+    function obterCuponsAtivos() {
+        try {
+            const salvas = localStorage.getItem('fomek_cupons');
+            if (salvas) {
+                const parsed = JSON.parse(salvas);
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            }
+        } catch(e){}
+        return [...CUPONS_PADRAO];
+    }
+
+    function renderCarrosselCuponsHome() {
+        const container = document.getElementById('carrossel-cupons-disponiveis');
+        if (!container) return;
+        const cupons = obterCuponsAtivos().filter(c => c.ativo !== false);
+        if (cupons.length === 0) {
+            container.innerHTML = '';
+            return;
+        }
+
+        container.innerHTML = cupons.map(c => `
+            <div onclick="copiarCupomHome('${c.codigo}')" class="shrink-0 bg-gradient-to-r from-[#fff5f7] to-[#fde8ed] border border-[#f0c9d0] hover:border-[#ab4e5e] rounded-2xl p-2.5 px-3.5 flex items-center gap-2.5 shadow-2xs cursor-pointer active:scale-95 transition-all">
+                <div class="w-8 h-8 rounded-xl bg-[#ab4e5e] text-white flex items-center justify-center text-xs font-black shadow-xs shrink-0">
+                    <i class="fa-solid fa-ticket"></i>
+                </div>
+                <div class="min-w-0">
+                    <div class="flex items-center gap-1.5">
+                        <span class="font-mono font-black text-xs text-[#ab4e5e] tracking-wider">${c.codigo}</span>
+                        <span class="text-[9px] font-black uppercase px-1.5 py-0.2 bg-white text-emerald-700 rounded border border-emerald-200">
+                            ${c.tipo === 'frete-gratis' ? 'Frete Grátis' : c.tipo === 'porcentagem' ? c.desconto + '% OFF' : 'R$ ' + parseFloat(c.desconto).toFixed(2).replace('.',',') + ' OFF'}
+                        </span>
+                    </div>
+                    <p class="text-[10px] text-slate-500 truncate max-w-[200px]">${c.descricao || 'Toque para copiar cupom'}</p>
+                </div>
+                <i class="fa-solid fa-copy text-slate-400 text-xs ml-1"></i>
+            </div>
+        `).join('');
+    }
+
+    function copiarCupomHome(codigo) {
+        try { navigator.clipboard?.writeText(codigo); } catch(e){}
+        const inp = document.getElementById('inp-cupom');
+        if (inp) inp.value = codigo;
+        showToast(`🎟️ Cupom ${codigo} copiado! Use na finalização do pedido.`, 'success');
+    }
+
+    function aplicarCupomCheckout() {
+        const inp = document.getElementById('inp-cupom');
+        const codigo = (inp?.value || '').trim().toUpperCase();
+        if (!codigo) {
+            showToast('⚠️ Digite o código do cupom.', 'warning');
+            return;
+        }
+
+        const cupons = obterCuponsAtivos();
+        const cupom = cupons.find(c => c.codigo.toUpperCase() === codigo && c.ativo !== false);
+
+        if (!cupom) {
+            showToast('❌ Cupom inválido ou expirado.', 'error');
+            return;
+        }
+
+        const sub = calcularSubtotal();
+        const min = parseFloat(cupom.pedidoMinimo) || 0;
+        if (sub < min) {
+            showToast(`⚠️ Este cupom exige pedido mínimo de R$ ${min.toFixed(2).replace('.', ',')}.`, 'warning');
+            return;
+        }
+
+        if (cupom.lojaId && cupom.lojaId !== 'todas' && lojaAtual && lojaAtual.id !== cupom.lojaId) {
+            showToast(`⚠️ Este cupom é exclusivo da loja ${cupom.lojaNome || cupom.lojaId}.`, 'warning');
+            return;
+        }
+
+        cupomAtivoNoPedido = cupom;
+
+        if (cupom.tipo === 'frete-gratis') {
+            valorDescontoCupom = freteAtual;
+        } else if (cupom.tipo === 'fixo') {
+            valorDescontoCupom = Math.min(parseFloat(cupom.desconto) || 0, sub);
+        } else if (cupom.tipo === 'porcentagem') {
+            valorDescontoCupom = sub * ((parseFloat(cupom.desconto) || 0) / 100);
+        }
+
+        const tag = document.getElementById('cupom-status-tag');
+        if (tag) {
+            tag.textContent = `✅ ${cupom.codigo} Aplicado!`;
+            tag.classList.remove('hidden');
+        }
+
+        const msg = document.getElementById('cupom-info-msg');
+        if (msg) {
+            msg.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i> ${cupom.descricao || 'Desconto aplicado com sucesso!'}`;
+            msg.classList.remove('hidden');
+        }
+
+        atualizarResumoForm();
+        showToast(`🎉 Cupom ${cupom.codigo} aplicado com sucesso!`, 'success');
+    }
+
     </script>
 </body>
 </html>

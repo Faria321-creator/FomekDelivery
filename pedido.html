@@ -2,17 +2,430 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FOMEK seu app de Delivery - Da Silva Doceria</title>
-    <meta http-equiv="refresh" content="0; url=index.html">
-    <script>
-        window.location.replace("index.html");
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#2e171e">
+    <title>Acompanhar Pedido • FOMEK seu app de Delivery</title>
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="img/fomek_favicon.png">
+    <link rel="apple-touch-icon" href="img/fomek_favicon.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background: #fdf5f6; color: #2e171e; }
+        .font-brand { font-family: 'Playfair Display', serif; }
+        .hero-bg { background: linear-gradient(160deg, #2e171e 0%, #5c2a35 55%, #8b4454 100%); }
+        .pulse-subtle { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .7; } }
+    </style>
 </head>
-<body style="font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; background-color: #fdf5f6; color: #2e171e; margin: 0;">
-    <div style="text-align: center; padding: 20px;">
-        <h2 style="color: #ab4e5e;">Abrindo o aplicativo FOMEK...</h2>
-        <p>Caso não abra automaticamente, <a href="index.html" style="color: #2e171e; font-weight: bold; text-decoration: underline;">clique aqui para abrir o Cardápio</a>.</p>
-    </div>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- Topo / Header da Marca -->
+    <header class="hero-bg text-white py-4 px-4 shadow-md sticky top-0 z-30">
+        <div class="max-w-xl mx-auto flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2.5 hover:opacity-90 transition-opacity">
+                <img src="img/logo.png" alt="Da Silva Doceria" class="w-10 h-10 rounded-full border border-white/30 object-cover shadow">
+                <div>
+                    <h1 class="font-brand font-bold text-base leading-tight">Da Silva Doceria</h1>
+                    <p class="text-[10px] text-pink-200 uppercase tracking-widest font-semibold">FOMEK Delivery</p>
+                </div>
+            </a>
+            <a href="index.html" class="text-xs bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all">
+                <i class="fa-solid fa-arrow-left text-[10px]"></i>
+                <span>Cardápio</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="max-w-xl mx-auto w-full p-4 flex-1 space-y-4">
+
+        <!-- Card de Status do Pedido -->
+        <div id="card-status" class="bg-white rounded-3xl p-5 shadow-sm border border-[#faedf0] text-center space-y-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#fff0f3] text-[#ab4e5e] rounded-full text-xs font-bold border border-[#f0c9d0]">
+                <span class="w-2 h-2 rounded-full bg-[#ab4e5e] animate-ping"></span>
+                <span id="pedido-codigo">Pedido #---</span>
+            </div>
+
+            <div id="status-icon-box" class="w-20 h-20 mx-auto rounded-3xl bg-[#fde8ed] text-[#ab4e5e] flex items-center justify-center text-3xl shadow-inner border border-[#f0c9d0]">
+                <i class="fa-solid fa-clock pulse-subtle"></i>
+            </div>
+
+            <div>
+                <h2 id="status-titulo" class="font-brand font-bold text-xl text-[#2e171e]">Aguardando Pedido...</h2>
+                <p id="status-desc" class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Carregando as informações atualizadas do seu pedido em tempo real.</p>
+            </div>
+
+            <!-- Stepper / Linha do Tempo -->
+            <div class="pt-2">
+                <div class="grid grid-cols-4 gap-1.5 text-center text-[10px] font-bold">
+                    <div id="step-1" class="space-y-1 text-slate-400">
+                        <div class="step-bar h-1.5 rounded-full bg-slate-200"></div>
+                        <span>1. Recebido</span>
+                    </div>
+                    <div id="step-2" class="space-y-1 text-slate-400">
+                        <div class="step-bar h-1.5 rounded-full bg-slate-200"></div>
+                        <span>2. Confirmado</span>
+                    </div>
+                    <div id="step-3" class="space-y-1 text-slate-400">
+                        <div class="step-bar h-1.5 rounded-full bg-slate-200"></div>
+                        <span>3. Produção</span>
+                    </div>
+                    <div id="step-4" class="space-y-1 text-slate-400">
+                        <div class="step-bar h-1.5 rounded-full bg-slate-200"></div>
+                        <span id="step-4-label">4. Entrega</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bloco de Pagamento Pix Asaas (se pendente) -->
+        <div id="bloco-pix-pagamento" class="hidden bg-white rounded-3xl p-5 shadow-sm border-2 border-[#c58a80] space-y-4 text-center">
+            <div class="flex items-center justify-center gap-2 text-xs font-extrabold text-emerald-700 bg-emerald-50 py-1.5 px-3 rounded-full border border-emerald-200">
+                <i class="fa-brands fa-pix text-base"></i>
+                <span>Pague via PIX para confirmação imediata</span>
+            </div>
+
+            <div class="p-3 bg-[#fff8f9] rounded-2xl border border-[#faedf0] inline-block mx-auto">
+                <img id="pix-qr-img" src="" alt="QR Code PIX" class="w-56 h-56 mx-auto rounded-xl object-contain shadow-xs bg-white p-2">
+            </div>
+
+            <div>
+                <p class="text-xs text-slate-500">Valor total a pagar:</p>
+                <p id="pix-valor-display" class="font-extrabold text-2xl text-[#ab4e5e]">R$ 0,00</p>
+            </div>
+
+            <!-- Copia e Cola -->
+            <div class="space-y-2 text-left">
+                <label class="block text-[11px] font-bold text-[#4a2d36] uppercase tracking-wider">Pix Copia e Cola:</label>
+                <div class="flex gap-2">
+                    <input type="text" id="pix-copia-cola-inp" readonly class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-700 focus:outline-none select-all">
+                    <button type="button" onclick="copiarPixCodigo()" class="px-4 py-2 bg-[#ab4e5e] hover:bg-[#96404f] text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 shadow-sm">
+                        <i class="fa-regular fa-copy"></i>
+                        <span id="btn-copiar-texto">Copiar</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Status do pagamento -->
+            <div id="pix-status-box" class="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-xs text-amber-800 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-spinner fa-spin text-amber-600"></i>
+                <span>Aguardando identificação do pagamento...</span>
+            </div>
+        </div>
+
+        <!-- Bloco Pagamento Confirmado -->
+        <div id="bloco-pix-confirmado" class="hidden bg-emerald-50 border border-emerald-200 rounded-3xl p-4 text-center space-y-1.5">
+            <div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center mx-auto text-lg">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <p class="font-bold text-emerald-900 text-sm">Pagamento Aprovado com Sucesso!</p>
+            <p class="text-xs text-emerald-700">Seu pedido já foi enviado para a cozinha da doceria.</p>
+        </div>
+
+        <!-- Resumo dos Itens e Valores -->
+        <div class="bg-white rounded-3xl p-5 shadow-sm border border-[#faedf0] space-y-3">
+            <h3 class="font-bold text-sm text-[#2e171e] uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-receipt text-[#c58a80]"></i>
+                <span>Itens do seu Pedido</span>
+            </h3>
+
+            <div id="itens-lista" class="divide-y divide-slate-100 text-xs">
+                <!-- Injetado via JS -->
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 space-y-1.5 text-xs">
+                <div class="flex justify-between text-slate-500">
+                    <span>Subtotal:</span>
+                    <span id="resumo-subtotal" class="font-semibold text-slate-800">R$ 0,00</span>
+                </div>
+                <div class="flex justify-between text-slate-500">
+                    <span id="resumo-taxa-label">Taxa de Entrega:</span>
+                    <span id="resumo-taxa" class="font-semibold text-slate-800">R$ 0,00</span>
+                </div>
+                <div class="flex justify-between text-base font-extrabold text-[#2e171e] pt-1.5 border-t border-slate-200">
+                    <span>Total:</span>
+                    <span id="resumo-total" class="text-[#ab4e5e]">R$ 0,00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Endereço de Entrega / Retirada -->
+        <div class="bg-white rounded-3xl p-5 shadow-sm border border-[#faedf0] space-y-2 text-xs">
+            <h3 class="font-bold text-sm text-[#2e171e] uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-location-dot text-[#c58a80]"></i>
+                <span id="modalidade-label">Endereço de Entrega</span>
+            </h3>
+            <p id="endereco-texto" class="text-slate-600 leading-relaxed"></p>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="space-y-2 pt-2">
+            <button type="button" onclick="abrirWhatsAppLoja()" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl shadow-md flex items-center justify-center gap-2 text-sm transition-all">
+                <i class="fa-brands fa-whatsapp text-lg"></i>
+                <span>Falar com a Doceria no WhatsApp</span>
+            </button>
+            <a href="index.html" class="w-full py-3 bg-white hover:bg-[#fff0f3] text-[#ab4e5e] font-bold rounded-2xl border border-[#f0c9d0] flex items-center justify-center gap-2 text-xs transition-all">
+                <i class="fa-solid fa-plus text-[10px]"></i>
+                <span>Fazer Outro Pedido</span>
+            </a>
+        </div>
+
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="py-4 text-center text-xs text-slate-400">
+        <p>Da Silva Doceria • FOMEK seu app de Delivery</p>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast-container" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <script src="js/data.js"></script>
+    <script src="js/asaas.js"></script>
+    <script>
+        let pedidoAtual = null;
+        let timerPoll = null;
+
+        function getParamId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        function formatMoney(val) {
+            return (val || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function carregarPedido() {
+            const id = getParamId();
+            if (!id) {
+                // Sem ID, volta para o cardápio
+                window.location.replace("index.html");
+                return;
+            }
+
+            // 1. Buscar nas vendas locais
+            const vendas = JSON.parse(localStorage.getItem('ds_vendas') || '[]');
+            pedidoAtual = vendas.find(v => String(v.id) === String(id));
+
+            if (!pedidoAtual) {
+                // Tentar buscar do CloudSync se ativo
+                try {
+                    const cloudId = localStorage.getItem('ds_cloud_object_id') || 'ff808181a09d98f701a0d1c6e4d30409';
+                    fetch(`https://api.restful-api.dev/objects/${cloudId}`).then(r => r.json()).then(cloudObj => {
+                        if (cloudObj && cloudObj.data && cloudObj.data.vendas) {
+                            const p = cloudObj.data.vendas.find(v => String(v.id) === String(id));
+                            if (p) {
+                                pedidoAtual = p;
+                                renderizarDados();
+                            }
+                        }
+                    }).catch(() => {});
+                } catch(e) {}
+            }
+
+            renderizarDados();
+        }
+
+        function renderizarDados() {
+            if (!pedidoAtual) {
+                document.getElementById('status-titulo').textContent = 'Buscando Pedido...';
+                return;
+            }
+
+            const p = pedidoAtual;
+            document.getElementById('pedido-codigo').textContent = `Pedido #${String(p.id).slice(-4)}`;
+
+            // Renderizar status
+            atualizarVisualStatus(p.status || 'Pendente');
+
+            // Resumo de Itens
+            const containerItens = document.getElementById('itens-lista');
+            containerItens.innerHTML = (p.itens || []).map(i => `
+                <div class="py-2 flex justify-between items-center gap-2">
+                    <div>
+                        <p class="font-bold text-[#2e171e]">${i.qtd}x ${i.nome}</p>
+                        ${i.obs ? `<p class="text-[10px] text-slate-400 italic">"${i.obs}"</p>` : ''}
+                    </div>
+                    <span class="font-bold text-slate-800">${formatMoney((i.preco || 0) * i.qtd)}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('resumo-subtotal').textContent = formatMoney(p.subtotal || p.totalBruto);
+            document.getElementById('resumo-taxa').textContent = p.taxaOuFrete > 0 ? formatMoney(p.taxaOuFrete) : 'Grátis';
+            document.getElementById('resumo-total').textContent = formatMoney(p.totalBruto);
+
+            // Endereço
+            const isDelivery = String(p.cliente || '').toLowerCase().includes('delivery') || (p.endereco && !p.endereco.includes('Balcão'));
+            if (isDelivery) {
+                document.getElementById('modalidade-label').textContent = 'Endereço de Entrega (Delivery)';
+                document.getElementById('endereco-texto').textContent = p.endereco || 'Endereço informado via WhatsApp';
+            } else {
+                document.getElementById('modalidade-label').textContent = 'Modalidade: Retirada no Balcão';
+                document.getElementById('endereco-texto').textContent = 'Retirada presencial na Da Silva Doceria: Avenida José Moreira Miguel, 733 - Jd. Primavera, Lorena-SP';
+            }
+
+            // Bloco PIX
+            const ehPix = (p.formaPagamento || '').toLowerCase().includes('pix');
+            const estaPago = p.status === 'Pago' || p.status === 'Em Produção' || p.status === 'Saiu para Entrega' || p.status === 'Concluído';
+
+            if (ehPix && !estaPago && p.pixDados) {
+                document.getElementById('bloco-pix-pagamento').classList.remove('hidden');
+                document.getElementById('bloco-pix-confirmado').classList.add('hidden');
+                document.getElementById('pix-qr-img').src = p.pixDados.qrCodeImg;
+                document.getElementById('pix-copia-cola-inp').value = p.pixDados.copiaCola;
+                document.getElementById('pix-valor-display').textContent = formatMoney(p.totalBruto);
+
+                iniciarPollingAsaas();
+            } else if (estaPago) {
+                document.getElementById('bloco-pix-pagamento').classList.add('hidden');
+                if (ehPix) {
+                    document.getElementById('bloco-pix-confirmado').classList.remove('hidden');
+                }
+            }
+        }
+
+        function atualizarVisualStatus(status) {
+            const steps = [
+                document.getElementById('step-1'),
+                document.getElementById('step-2'),
+                document.getElementById('step-3'),
+                document.getElementById('step-4')
+            ];
+
+            const resetSteps = () => {
+                steps.forEach(s => {
+                    s.className = 'space-y-1 text-slate-400';
+                    s.querySelector('.step-bar').className = 'step-bar h-1.5 rounded-full bg-slate-200';
+                });
+            };
+
+            const activateStep = (idx) => {
+                for (let i = 0; i <= idx; i++) {
+                    steps[i].className = 'space-y-1 text-[#ab4e5e] font-black';
+                    steps[i].querySelector('.step-bar').className = 'step-bar h-1.5 rounded-full bg-[#ab4e5e]';
+                }
+            };
+
+            resetSteps();
+
+            const st = (status || 'Pendente').toLowerCase();
+
+            if (st.includes('pendente') || st.includes('novo')) {
+                activateStep(0);
+                document.getElementById('status-icon-box').innerHTML = '<i class="fa-solid fa-receipt pulse-subtle"></i>';
+                document.getElementById('status-titulo').textContent = 'Pedido Recebido!';
+                document.getElementById('status-desc').textContent = 'Seu pedido foi registrado. Aguardando confirmação do pagamento ou da doceria.';
+            } else if (st.includes('pago') || st.includes('confirmado')) {
+                activateStep(1);
+                document.getElementById('status-icon-box').innerHTML = '<i class="fa-solid fa-check text-emerald-600"></i>';
+                document.getElementById('status-titulo').textContent = 'Pagamento Confirmado!';
+                document.getElementById('status-desc').textContent = 'Tudo certo! Seu pedido já foi aprovado e passará para a produção.';
+            } else if (st.includes('produ') || st.includes('preparo')) {
+                activateStep(2);
+                document.getElementById('status-icon-box').innerHTML = '<i class="fa-solid fa-kitchen-set text-[#ab4e5e]"></i>';
+                document.getElementById('status-titulo').textContent = 'Em Produção 🍓';
+                document.getElementById('status-desc').textContent = 'Seus doces deliciosos estão sendo preparados e embalados com todo carinho!';
+            } else if (st.includes('entrega') || st.includes('saiu')) {
+                activateStep(3);
+                document.getElementById('status-icon-box').innerHTML = '<i class="fa-solid fa-motorcycle text-emerald-600"></i>';
+                document.getElementById('status-titulo').textContent = 'Saiu para Entrega! 🛵';
+                document.getElementById('status-desc').textContent = 'O motoboy já está a caminho com o seu pedido. Fique atento ao interfone ou portão!';
+            } else if (st.includes('conclu') || st.includes('entregue')) {
+                activateStep(3);
+                document.getElementById('status-icon-box').innerHTML = '<i class="fa-solid fa-heart text-pink-600"></i>';
+                document.getElementById('status-titulo').textContent = 'Pedido Entregue! 💖';
+                document.getElementById('status-desc').textContent = 'Obrigado por escolher a Da Silva Doceria! Tenha um dia muito doce e especial.';
+            }
+        }
+
+        async function copiarPixCodigo() {
+            const inp = document.getElementById('pix-copia-cola-inp');
+            const ok = await AsaasPagamento.copiarPix(inp.value);
+            const btn = document.getElementById('btn-copiar-texto');
+            if (ok) {
+                btn.textContent = 'Copiado!';
+                showToast('Chave Pix Copiada com Sucesso!', 'success');
+                setTimeout(() => btn.textContent = 'Copiar', 3000);
+            } else {
+                inp.select();
+                document.execCommand('copy');
+                showToast('Chave selecionada para cópia!', 'info');
+            }
+        }
+
+        function iniciarPollingAsaas() {
+            if (timerPoll) clearInterval(timerPoll);
+
+            timerPoll = setInterval(async () => {
+                if (!pedidoAtual) return;
+
+                // 1. Checar status no Asaas se houver paymentId do Asaas
+                if (pedidoAtual.pixDados && pedidoAtual.pixDados.paymentId && !pedidoAtual.pixDados.paymentId.startsWith('PIX_')) {
+                    const res = await AsaasPagamento.consultarStatus(pedidoAtual.pixDados.paymentId);
+                    if (res && res.pago) {
+                        clearInterval(timerPoll);
+                        pedidoAtual.status = 'Pago';
+                        salvarAtualizacaoPedidoLocal();
+                        renderizarDados();
+                        showToast('Pagamento confirmado pelo Asaas!', 'success');
+                        return;
+                    }
+                }
+
+                // 2. Checar se o gestor atualizou o status (via localStorage ou nuvem)
+                const vendas = JSON.parse(localStorage.getItem('ds_vendas') || '[]');
+                const v = vendas.find(item => String(item.id) === String(pedidoAtual.id));
+                if (v && v.status !== pedidoAtual.status) {
+                    pedidoAtual.status = v.status;
+                    renderizarDados();
+                }
+            }, 4000);
+        }
+
+        function salvarAtualizacaoPedidoLocal() {
+            try {
+                const vendas = JSON.parse(localStorage.getItem('ds_vendas') || '[]');
+                const idx = vendas.findIndex(v => String(v.id) === String(pedidoAtual.id));
+                if (idx !== -1) {
+                    vendas[idx].status = pedidoAtual.status;
+                    localStorage.setItem('ds_vendas', JSON.stringify(vendas));
+                }
+            } catch (e) {}
+        }
+
+        function abrirWhatsAppLoja() {
+            let whats = '5512999999999';
+            try {
+                const cfg = JSON.parse(localStorage.getItem('ds_config_loja') || '{}');
+                if (cfg.whatsapp) whats = cfg.whatsapp.replace(/\D/g, '');
+            } catch (e) {}
+
+            const tel = whats.startsWith('55') ? whats : `55${whats}`;
+            const cod = pedidoAtual ? String(pedidoAtual.id).slice(-4) : '';
+            const msg = encodeURIComponent(`Olá! Gostaria de falar sobre o meu pedido #${cod} no FOMEK Delivery.`);
+            window.open(`https://api.whatsapp.com/send?phone=${tel}&text=${msg}`, '_blank');
+        }
+
+        function showToast(msg, tipo = 'info') {
+            const container = document.getElementById('toast-container');
+            const colors = { success:'bg-emerald-600 text-white', warning:'bg-amber-500 text-white', info:'bg-[#ab4e5e] text-white' };
+            const div = document.createElement('div');
+            div.className = `${colors[tipo] || colors.info} px-5 py-3 rounded-2xl shadow-xl text-xs font-bold text-center pointer-events-auto`;
+            div.textContent = msg;
+            container.appendChild(div);
+            setTimeout(() => div.remove(), 3500);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            carregarPedido();
+        });
+    </script>
 </body>
 </html>

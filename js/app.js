@@ -1,36 +1,149 @@
 /**
- * Da Silva Doceria - Sistema de Gestão & PDV
- * Lógica Completa da Aplicação com Calculadora de Lucro, Nova Categoria e Ajustes de Layout
+ * FOMEK Delivery - Sistema de Gestão & PDV da Loja Parceira
+ * Multi-Loja: Cada loja tem sua capa, logo, cardápio, categorias e KDS próprio
  */
+
+// ==========================================
+// CONTEXTO MULTI-LOJA FOMEK
+// ==========================================
+const urlParams = new URLSearchParams(window.location.search);
+const ID_LOJA_ATUAL = (urlParams.get('loja') || 'dasilva-doceria').toLowerCase().trim();
+
+function obterDadosLojaAtual() {
+    let lojas = [];
+    try {
+        const raw = localStorage.getItem('fomek_lojas_master') || localStorage.getItem('fomek_stores_v1');
+        if (raw) lojas = JSON.parse(raw);
+    } catch(e) {}
+
+    let loja = lojas.find(l => (l.id || '').toLowerCase() === ID_LOJA_ATUAL);
+    if (!loja && typeof LOJAS_PADRAO !== 'undefined' && Array.isArray(LOJAS_PADRAO)) {
+        loja = LOJAS_PADRAO.find(l => (l.id || '').toLowerCase() === ID_LOJA_ATUAL);
+    }
+    if (!loja) {
+        const nomeFormatado = ID_LOJA_ATUAL.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        loja = {
+            id: ID_LOJA_ATUAL,
+            nome: nomeFormatado || 'Minha Loja Parceira',
+            categoriaPrincipal: 'Restaurante',
+            logo: 'img/fomek_logo.png',
+            capa: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=700&auto=format&fit=crop&q=80',
+            taxaEntrega: 6.50,
+            tempoEntrega: '30-45 min',
+            status: 'Aberta',
+            produtos: [],
+            categorias: ['Destaques', 'Geral', 'Bebidas']
+        };
+    }
+
+    // Mesclar com personalizações salvas pelo gestor desta loja
+    try {
+        const layoutSalvo = localStorage.getItem(`ds_layout_${ID_LOJA_ATUAL}`);
+        if (layoutSalvo) {
+            const lObj = JSON.parse(layoutSalvo);
+            loja = Object.assign({}, loja, lObj);
+        }
+    } catch(e) {}
+
+    return loja;
+}
+
+const DADOS_LOJA_ATUAL = obterDadosLojaAtual();
 
 // ==========================================
 // ESTADO GLOBAL & PERSISTÊNCIA LOCALSTORAGE
 // ==========================================
 
 function carregarProdutosIniciais() {
-    const salvos = localStorage.getItem('ds_produtos_v2');
-    if (salvos) {
-        try {
-            return JSON.parse(salvos);
-        } catch (e) {
-            console.error('Erro ao ler produtos salvos:', e);
+    if (ID_LOJA_ATUAL === 'dasilva-doceria') {
+        const salvos = localStorage.getItem('ds_produtos_v2');
+        if (salvos) {
+            try { return JSON.parse(salvos); } catch (e) {
+                console.error('Erro ao ler produtos salvos:', e);
+            }
         }
+        const antigos = localStorage.getItem('ds_produtos');
+        if (antigos) {
+            try {
+                const parsed = JSON.parse(antigos);
+                if (parsed.length > 10) return parsed;
+            } catch (e) {}
+        }
+        return [...PRODUTOS_PADRAO];
+    } else {
+        const salvos = localStorage.getItem('ds_produtos_' + ID_LOJA_ATUAL);
+        if (salvos) {
+            try {
+                const parsed = JSON.parse(salvos);
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            } catch(e) {}
+        }
+        if (DADOS_LOJA_ATUAL && Array.isArray(DADOS_LOJA_ATUAL.produtos) && DADOS_LOJA_ATUAL.produtos.length > 0) {
+            return JSON.parse(JSON.stringify(DADOS_LOJA_ATUAL.produtos));
+        }
+        return [
+            {
+                id: Date.now(),
+                nome: "Prato Especial " + (DADOS_LOJA_ATUAL.nome || 'da Casa'),
+                categoria: (DADOS_LOJA_ATUAL.categorias && DADOS_LOJA_ATUAL.categorias[0]) || "Destaques",
+                descricao: "Especialidade artesanal preparada com ingredientes selecionados.",
+                preco: 29.90,
+                custo: 10.00,
+                icone: "fa-utensils"
+            }
+        ];
     }
-    const antigos = localStorage.getItem('ds_produtos');
-    if (antigos) {
+}
+
+function carregarCategoriasIniciais() {
+    if (ID_LOJA_ATUAL === 'dasilva-doceria') {
         try {
-            const parsed = JSON.parse(antigos);
-            if (parsed.length > 10) return parsed;
-        } catch (e) {}
+            const cat = JSON.parse(localStorage.getItem('ds_categorias'));
+            if (Array.isArray(cat) && cat.length > 0) return cat;
+        } catch(e) {}
+        return [...CATEGORIAS_PADRAO];
+    } else {
+        try {
+            const cat = JSON.parse(localStorage.getItem('ds_categorias_' + ID_LOJA_ATUAL));
+            if (Array.isArray(cat) && cat.length > 0) return cat;
+        } catch(e) {}
+        if (DADOS_LOJA_ATUAL && Array.isArray(DADOS_LOJA_ATUAL.categorias) && DADOS_LOJA_ATUAL.categorias.length > 0) {
+            return [...DADOS_LOJA_ATUAL.categorias];
+        }
+        return ['Destaques', 'Geral', 'Bebidas'];
     }
-    return [...PRODUTOS_PADRAO];
+}
+
+function carregarVendasIniciais() {
+    let todasVendas = [];
+    try {
+        const salvos = localStorage.getItem('ds_vendas');
+        if (salvos) todasVendas = JSON.parse(salvos);
+    } catch(e) {}
+
+    try {
+        const salvosLoja = localStorage.getItem('ds_vendas_' + ID_LOJA_ATUAL);
+        if (salvosLoja) {
+            const parsedLoja = JSON.parse(salvosLoja);
+            parsedLoja.forEach(v => {
+                if (!todasVendas.some(x => x.id === v.id)) todasVendas.push(v);
+            });
+        }
+    } catch(e) {}
+
+    if (ID_LOJA_ATUAL === 'dasilva-doceria') {
+        const vLoja = todasVendas.filter(v => !v.lojaId || v.lojaId === 'dasilva-doceria');
+        return vLoja;
+    } else {
+        return todasVendas.filter(v => v.lojaId === ID_LOJA_ATUAL);
+    }
 }
 
 let produtos = carregarProdutosIniciais();
-let categorias = JSON.parse(localStorage.getItem('ds_categorias')) || [...CATEGORIAS_PADRAO];
+let categorias = carregarCategoriasIniciais();
 let faixasKM = JSON.parse(localStorage.getItem('ds_faixasKM')) || [...FAIXAS_KM_PADRAO];
 let contas = JSON.parse(localStorage.getItem('ds_contas')) || [...CONTAS_PADRAO];
-let vendas = JSON.parse(localStorage.getItem('ds_vendas')) || [...VENDAS_PADRAO];
+let vendas = carregarVendasIniciais();
 let insumos = JSON.parse(localStorage.getItem('ds_insumos')) || [...INSUMOS_PADRAO];
 
 // Itens atuais do carrinho no PDV
@@ -56,12 +169,45 @@ let vendaSelecionada = null;
 // ==========================================
 
 function saveData() {
-    localStorage.setItem('ds_produtos_v2', JSON.stringify(produtos));
-    localStorage.setItem('ds_categorias', JSON.stringify(categorias));
-    localStorage.setItem('ds_faixasKM', JSON.stringify(faixasKM));
-    localStorage.setItem('ds_contas', JSON.stringify(contas));
-    localStorage.setItem('ds_vendas', JSON.stringify(vendas));
-    localStorage.setItem('ds_insumos', JSON.stringify(insumos));
+    if (ID_LOJA_ATUAL === 'dasilva-doceria') {
+        localStorage.setItem('ds_produtos_v2', JSON.stringify(produtos));
+        localStorage.setItem('ds_categorias', JSON.stringify(categorias));
+        localStorage.setItem('ds_faixasKM', JSON.stringify(faixasKM));
+        localStorage.setItem('ds_contas', JSON.stringify(contas));
+        localStorage.setItem('ds_vendas', JSON.stringify(vendas));
+        localStorage.setItem('ds_insumos', JSON.stringify(insumos));
+    } else {
+        localStorage.setItem('ds_produtos_' + ID_LOJA_ATUAL, JSON.stringify(produtos));
+        localStorage.setItem('ds_categorias_' + ID_LOJA_ATUAL, JSON.stringify(categorias));
+        localStorage.setItem('ds_faixasKM_' + ID_LOJA_ATUAL, JSON.stringify(faixasKM));
+        localStorage.setItem('ds_contas_' + ID_LOJA_ATUAL, JSON.stringify(contas));
+        localStorage.setItem('ds_vendas_' + ID_LOJA_ATUAL, JSON.stringify(vendas));
+    }
+
+    // Sincroniza vendas gerais com identificação de loja
+    try {
+        let todasVendas = JSON.parse(localStorage.getItem('ds_vendas') || '[]');
+        vendas.forEach(v => {
+            const idx = todasVendas.findIndex(x => x.id === v.id);
+            const vComLoja = { ...v, lojaId: v.lojaId || ID_LOJA_ATUAL };
+            if (idx >= 0) todasVendas[idx] = vComLoja;
+            else todasVendas.unshift(vComLoja);
+        });
+        localStorage.setItem('ds_vendas', JSON.stringify(todasVendas));
+    } catch(e) {}
+
+    // Sincroniza produtos e categorias no fomek_lojas_master para refletir no index.html e central_gestao
+    try {
+        let master = JSON.parse(localStorage.getItem('fomek_lojas_master') || '[]');
+        if (Array.isArray(master) && master.length > 0) {
+            const idx = master.findIndex(l => (l.id || '').toLowerCase() === ID_LOJA_ATUAL);
+            if (idx >= 0) {
+                master[idx].produtos = produtos;
+                master[idx].categorias = categorias;
+                localStorage.setItem('fomek_lojas_master', JSON.stringify(master));
+            }
+        }
+    } catch(e) {}
 
     if (typeof CloudSync !== 'undefined' && CloudSync.pushToCloud) {
         CloudSync.pushToCloud('saveData');
@@ -73,16 +219,22 @@ function saveData() {
 // ==========================================
 
 function getConfigLoja() {
+    const key = ID_LOJA_ATUAL === 'dasilva-doceria' ? 'ds_config_loja' : `ds_config_${ID_LOJA_ATUAL}`;
     const def = {
-        lojaAberta: true,
-        whatsapp: '',
-        endereco: '',
-        pedidoMinimo: 20,
-        tempoEntrega: '40-60 min',
-        aviso: ''
+        nomeLoja: DADOS_LOJA_ATUAL.nome || 'Da Silva Doceria',
+        lojaAberta: DADOS_LOJA_ATUAL.status === 'Aberta' || DADOS_LOJA_ATUAL.status === 'Ativa',
+        whatsapp: DADOS_LOJA_ATUAL.whatsapp || DADOS_LOJA_ATUAL.phone || '',
+        endereco: DADOS_LOJA_ATUAL.endereco || DADOS_LOJA_ATUAL.address || '',
+        pedidoMinimo: DADOS_LOJA_ATUAL.pedidoMinimo || 20,
+        tempoEntrega: DADOS_LOJA_ATUAL.tempoEntrega || DADOS_LOJA_ATUAL.deliveryTime || '40-60 min',
+        aviso: DADOS_LOJA_ATUAL.destaque || '',
+        asaasToken: '',
+        asaasEnv: 'producao',
+        chavePix: DADOS_LOJA_ATUAL.chavePix || DADOS_LOJA_ATUAL.pix || '',
+        asaasApiUrl: '/api/asaas'
     };
     try {
-        return Object.assign(def, JSON.parse(localStorage.getItem('ds_config_loja') || '{}'));
+        return Object.assign(def, JSON.parse(localStorage.getItem(key) || '{}'));
     } catch (e) { return def; }
 }
 
@@ -92,13 +244,23 @@ function abrirModalConfigLoja() {
     const cfg = getConfigLoja();
     _lojaAbertaTemp = cfg.lojaAberta !== false;
 
+    if (document.getElementById('cfg-nome-loja')) {
+        document.getElementById('cfg-nome-loja').value = cfg.nomeLoja || DADOS_LOJA_ATUAL.nome || 'Da Silva Doceria';
+    }
     document.getElementById('cfg-whatsapp').value = cfg.whatsapp || '';
     document.getElementById('cfg-endereco').value = cfg.endereco || '';
     document.getElementById('cfg-pedido-minimo').value = cfg.pedidoMinimo || 20;
     document.getElementById('cfg-tempo-entrega').value = cfg.tempoEntrega || '40-60 min';
     document.getElementById('cfg-aviso').value = cfg.aviso || '';
-    atualizarToggleLoja(_lojaAbertaTemp);
 
+    if (document.getElementById('cfg-asaas-token')) {
+        document.getElementById('cfg-asaas-token').value = cfg.asaasToken || localStorage.getItem('ds_asaas_token') || '';
+        document.getElementById('cfg-asaas-env').value = cfg.asaasEnv || localStorage.getItem('ds_asaas_env') || 'producao';
+        document.getElementById('cfg-chave-pix').value = cfg.chavePix || localStorage.getItem('ds_chave_pix') || '';
+        document.getElementById('cfg-asaas-api').value = cfg.asaasApiUrl || localStorage.getItem('ds_asaas_api_url') || '/api/asaas';
+    }
+
+    atualizarToggleLoja(_lojaAbertaTemp);
     document.getElementById('modal-config-loja').classList.remove('hidden');
 }
 
@@ -139,26 +301,62 @@ function mascaraTelCfg(input) {
 
 function salvarConfigLoja(e) {
     if (e) e.preventDefault();
+    const nomeLoja = document.getElementById('cfg-nome-loja') ? document.getElementById('cfg-nome-loja').value.trim() : (DADOS_LOJA_ATUAL.nome || 'Da Silva Doceria');
     const whats = document.getElementById('cfg-whatsapp').value.trim();
     const endereco = document.getElementById('cfg-endereco').value.trim();
     const minimo = parseFloat(document.getElementById('cfg-pedido-minimo').value) || 20;
     const tempo = document.getElementById('cfg-tempo-entrega').value.trim() || '40-60 min';
     const aviso = document.getElementById('cfg-aviso').value.trim();
 
+    const asaasToken = document.getElementById('cfg-asaas-token') ? document.getElementById('cfg-asaas-token').value.trim() : '';
+    const asaasEnv = document.getElementById('cfg-asaas-env') ? document.getElementById('cfg-asaas-env').value : 'producao';
+    const chavePix = document.getElementById('cfg-chave-pix') ? document.getElementById('cfg-chave-pix').value.trim() : '';
+    const asaasApi = document.getElementById('cfg-asaas-api') ? document.getElementById('cfg-asaas-api').value.trim() : '/api/asaas';
+
     if (!whats) { showToast('Informe o WhatsApp da loja!', 'warning'); return; }
     if (!endereco) { showToast('Informe o endereço da loja!', 'warning'); return; }
 
     const cfg = {
+        nomeLoja: nomeLoja || DADOS_LOJA_ATUAL.nome || 'Da Silva Doceria',
         lojaAberta: _lojaAbertaTemp,
         whatsapp: '55' + whats.replace(/\D/g, ''),
         endereco,
         pedidoMinimo: minimo,
         tempoEntrega: tempo,
-        aviso
+        aviso,
+        asaasToken,
+        asaasEnv,
+        chavePix,
+        asaasApiUrl: asaasApi
     };
-    localStorage.setItem('ds_config_loja', JSON.stringify(cfg));
+    
+    const key = ID_LOJA_ATUAL === 'dasilva-doceria' ? 'ds_config_loja' : `ds_config_${ID_LOJA_ATUAL}`;
+    localStorage.setItem(key, JSON.stringify(cfg));
+
+    // Sincroniza com fomek_lojas_master
+    try {
+        let master = JSON.parse(localStorage.getItem('fomek_lojas_master') || '[]');
+        if (Array.isArray(master) && master.length > 0) {
+            const idx = master.findIndex(l => (l.id || '').toLowerCase() === ID_LOJA_ATUAL);
+            if (idx >= 0) {
+                master[idx].nome = cfg.nomeLoja;
+                master[idx].status = cfg.lojaAberta ? 'Aberta' : 'Fechada';
+                master[idx].whatsapp = cfg.whatsapp;
+                master[idx].endereco = cfg.endereco;
+                master[idx].pedidoMinimo = cfg.pedidoMinimo;
+                master[idx].tempoEntrega = cfg.tempoEntrega;
+                master[idx].destaque = cfg.aviso;
+                localStorage.setItem('fomek_lojas_master', JSON.stringify(master));
+            }
+        }
+    } catch(e) {}
+
+    if (typeof AsaasPagamento !== 'undefined' && AsaasPagamento.salvarConfig) {
+        AsaasPagamento.salvarConfig(asaasToken, asaasEnv, chavePix, asaasApi);
+    }
+
     fecharModalConfigLoja();
-    showToast(`✅ Configurações salvas! Loja ${cfg.lojaAberta ? 'Aberta 🟢' : 'Fechada 🔴'} no Pede Aí.`, 'success');
+    showToast(`✅ Configurações salvas! Loja ${cfg.lojaAberta ? 'Aberta 🟢' : 'Fechada 🔴'} no Fomek.`, 'success');
 
     // Sincronizar com nuvem
     if (typeof CloudSync !== 'undefined' && CloudSync.pushToCloud) {
@@ -167,15 +365,35 @@ function salvarConfigLoja(e) {
 }
 
 function restaurarCardapioPadrao() {
-    if (confirm("Deseja recarregar o cardápio oficial completo da Da Silva Doceria (38 itens das fotos)?")) {
-        produtos = JSON.parse(JSON.stringify(PRODUTOS_PADRAO));
-        categorias = [...CATEGORIAS_PADRAO];
-        saveData();
-        renderCategorias();
-        renderCatalogoDoces();
-        renderPdvCatalogo();
-        renderDashboard();
-        showToast("Cardápio oficial com 38 itens restaurado com sucesso! 💖", "success");
+    if (ID_LOJA_ATUAL === 'dasilva-doceria') {
+        if (confirm("Deseja recarregar o cardápio oficial completo da Da Silva Doceria (38 itens das fotos)?")) {
+            produtos = JSON.parse(JSON.stringify(PRODUTOS_PADRAO));
+            categorias = [...CATEGORIAS_PADRAO];
+            saveData();
+            renderCategorias();
+            renderCatalogoDoces();
+            renderPdvCatalogo();
+            renderDashboard();
+            showToast("Cardápio oficial com 38 itens restaurado com sucesso! 💖", "success");
+        }
+    } else {
+        const defaultProds = (DADOS_LOJA_ATUAL && Array.isArray(DADOS_LOJA_ATUAL.produtos) && DADOS_LOJA_ATUAL.produtos.length > 0)
+            ? JSON.parse(JSON.stringify(DADOS_LOJA_ATUAL.produtos))
+            : [];
+        const defaultCats = (DADOS_LOJA_ATUAL && Array.isArray(DADOS_LOJA_ATUAL.categorias) && DADOS_LOJA_ATUAL.categorias.length > 0)
+            ? [...DADOS_LOJA_ATUAL.categorias]
+            : ['Destaques', 'Geral', 'Bebidas'];
+
+        if (confirm(`Deseja restaurar o cardápio padrão de "${DADOS_LOJA_ATUAL.nome}"?`)) {
+            produtos = defaultProds;
+            categorias = defaultCats;
+            saveData();
+            renderCategorias();
+            renderCatalogoDoces();
+            renderPdvCatalogo();
+            renderDashboard();
+            showToast(`Cardápio padrão de "${DADOS_LOJA_ATUAL.nome}" restaurado com sucesso!`, "success");
+        }
     }
 }
 
@@ -387,17 +605,18 @@ function switchTab(tabId) {
         }
     }
 
+    const nomeLoja = DADOS_LOJA_ATUAL.nome || 'Loja Parceira';
     const titles = {
-        'dashboard': { title: 'Dashboard Geral', desc: 'Métricas, desempenho e faturamento da Da Silva Doceria', badge: 'Dashboard' },
-        'catalogo': { title: 'Catálogo de Doces', desc: 'Cardápio completo de sobremesas com pesquisa rápida e edição', badge: 'Catálogo' },
-        'pdv': { title: 'Novo Pedido / PDV', desc: 'Atenda clientes no balcão, WhatsApp Delivery ou lance vendas do iFood', badge: 'PDV & Vendas' },
-        'insumos': { title: 'Insumos & Estoque', desc: 'Controle de matérias-primas, recheios, frutas e embalagens', badge: 'Estoque' },
+        'pedidos': { title: 'Esteira de Pedidos & Cozinha', desc: `Gerenciamento em tempo real dos pedidos de ${nomeLoja}`, badge: 'Pedidos KDS' },
+        'dashboard': { title: `Dashboard – ${nomeLoja}`, desc: 'Métricas, desempenho e faturamento da loja', badge: 'Dashboard' },
+        'catalogo': { title: `Catálogo de Produtos`, desc: `Cardápio completo de ${nomeLoja} com pesquisa rápida e edição`, badge: 'Catálogo' },
         'frete': { title: 'Taxas de Frete (KM)', desc: 'Faixas de distância em KM e valores de entrega para WhatsApp', badge: 'Frete KM' },
-        'financeiro': { title: 'Financeiro & Contas', desc: 'Controle de despesas, contas a pagar e receitas de encomendas', badge: 'Financeiro' },
-        'historico': { title: 'Histórico de Vendas', desc: 'Consulte pedidos, emita comprovantes e envie pelo WhatsApp', badge: 'Histórico' }
+        'financeiro': { title: 'Financeiro & Contas', desc: 'Controle de despesas, contas a pagar e receitas', badge: 'Financeiro' },
+        'historico': { title: 'Histórico de Vendas', desc: `Consulte pedidos de ${nomeLoja}, emita comprovantes e envie pelo WhatsApp`, badge: 'Histórico' },
+        'layout': { title: `Personalizar Layout & Cores`, desc: `Identidade visual, logos, fotos e estilo exclusivo de ${nomeLoja}`, badge: 'Identidade Visual' }
     };
 
-    const header = titles[tabId] || { title: 'Da Silva Doceria', desc: 'Sistema de Gestão & Confeitaria', badge: 'Doceria' };
+    const header = titles[tabId] || { title: nomeLoja, desc: 'Sistema de Gestão FOMEK', badge: nomeLoja };
     const hTitle = document.getElementById('header-title');
     const hDesc = document.getElementById('header-desc');
     const mSub = document.getElementById('mobile-header-subtitle');
@@ -411,10 +630,10 @@ function switchTab(tabId) {
     const mainEl = document.querySelector('main');
     if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
 
+    if (tabId === 'pedidos') renderPedidosKDS();
     if (tabId === 'dashboard') renderDashboard();
     if (tabId === 'catalogo') renderCatalogoDoces();
     if (tabId === 'pdv') { renderPdvCatalogo(); renderPdvItens(); }
-    if (tabId === 'insumos') renderInsumos();
     if (tabId === 'frete') { renderFaixasKM(); renderTabelasFreteAdmin(); }
     if (tabId === 'financeiro') renderContas();
     if (tabId === 'historico') renderHistorico();
@@ -631,7 +850,7 @@ function renderCatalogoDoces() {
         return bateCategoria && bateBusca;
     });
 
-    if (badgeTotal) badgeTotal.innerText = `${produtos.length} sobremesas no cardápio`;
+    if (badgeTotal) badgeTotal.innerText = `${produtos.length} produto(s) no cardápio`;
 
     if (filtrados.length === 0) {
         container.innerHTML = `
@@ -735,13 +954,26 @@ function removerDoce(id) {
 // Modal Flutuante para Cadastrar / Editar Doce
 function abrirModalNovoDoce() {
     renderCategorias();
-    document.getElementById('modal-doce-titulo').innerText = "Cadastrar Novo Doce";
+    const isDoceria = ID_LOJA_ATUAL === 'dasilva-doceria';
+    const titulo = isDoceria ? 'Cadastrar Novo Doce' : 'Cadastrar Novo Produto';
+    const placeholder = isDoceria ? 'Ex: Copo da Felicidade Kinder Bueno 300ml' : 'Ex: Prato especial, Combo, Bebida...';
+
+    document.getElementById('modal-doce-titulo').innerText = titulo;
     document.getElementById('modal-doce-id').value = "";
     document.getElementById('modal-doce-nome').value = "";
+    document.getElementById('modal-doce-nome').placeholder = placeholder;
     document.getElementById('modal-doce-desc').value = "";
     document.getElementById('modal-doce-custo').value = "";
     document.getElementById('modal-doce-margem').value = "100";
     document.getElementById('modal-doce-preco').value = "";
+
+    // Logo dinâmica no modal
+    const modalLogo = document.getElementById('modal-doce-logo');
+    if (modalLogo) modalLogo.src = DADOS_LOJA_ATUAL.logo || 'img/logo.png';
+
+    const labelNome = document.getElementById('modal-label-nome-doce');
+    if (labelNome) labelNome.textContent = isDoceria ? 'Nome do Doce / Sobremesa' : 'Nome do Produto';
+
     calcularPrecoPorMargem('custo');
     renderFotosModal([]);
     document.getElementById('modal-flutuante-doce').classList.remove('hidden');
@@ -752,13 +984,21 @@ function abrirModalEdicaoDoce(id) {
     if (!doce) return;
 
     renderCategorias();
-    document.getElementById('modal-doce-titulo').innerText = "Editar Doce do Cardápio";
+    const isDoceria = ID_LOJA_ATUAL === 'dasilva-doceria';
+    document.getElementById('modal-doce-titulo').innerText = isDoceria ? "Editar Doce do Cardápio" : "Editar Produto do Cardápio";
     document.getElementById('modal-doce-id').value = doce.id;
     document.getElementById('modal-doce-nome').value = doce.nome;
-    document.getElementById('modal-doce-categoria').value = doce.categoria || (categorias[0] || "Copos da Felicidade");
+    document.getElementById('modal-doce-categoria').value = doce.categoria || (categorias[0] || "Destaques");
     document.getElementById('modal-doce-desc').value = doce.descricao || "";
     document.getElementById('modal-doce-custo').value = doce.custo;
     document.getElementById('modal-doce-preco').value = doce.preco;
+
+    // Logo dinâmica no modal
+    const modalLogo = document.getElementById('modal-doce-logo');
+    if (modalLogo) modalLogo.src = DADOS_LOJA_ATUAL.logo || 'img/logo.png';
+
+    const labelNome = document.getElementById('modal-label-nome-doce');
+    if (labelNome) labelNome.textContent = isDoceria ? 'Nome do Doce / Sobremesa' : 'Nome do Produto';
 
     if (doce.custo > 0 && doce.preco > 0) {
         const margem = ((doce.preco - doce.custo) / doce.custo) * 100;
@@ -776,12 +1016,17 @@ function fecharModalDoce() {
     document.getElementById('modal-flutuante-doce').classList.add('hidden');
 }
 
-// ---- Gerenciamento de Fotos do Produto (até 4 fotos por doce) ----
+// ---- Gerenciamento de Fotos do Produto (até 4 fotos por doce/produto) ----
 let fotosTemp = [];
 
 function renderFotosModal(fotos) {
     fotosTemp = fotos ? [...fotos] : [];
     const container = document.getElementById('fotos-preview-container');
+    const badgeContador = document.getElementById('fotos-contador-badge');
+    if (badgeContador) {
+        badgeContador.textContent = `${fotosTemp.length}/4 fotos`;
+        badgeContador.className = `text-[10px] font-bold px-2 py-0.5 rounded-full ${fotosTemp.length === 4 ? 'bg-emerald-100 text-emerald-800' : 'bg-[#fde8ed] text-[#ab4e5e]'}`;
+    }
     if (!container) return;
 
     container.innerHTML = '';
@@ -790,7 +1035,8 @@ function renderFotosModal(fotos) {
         div.className = 'relative group shrink-0';
         div.innerHTML = `
             <img src="${src}" class="w-20 h-20 object-cover rounded-2xl border-2 border-[#f0c9d0] shadow-sm">
-            <button type="button" onclick="removerFotoModal(${idx})" class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-rose-600 text-white rounded-full flex items-center justify-center text-[10px] shadow cursor-pointer" title="Remover foto">
+            <span class="absolute bottom-1 left-1 bg-black/60 text-white text-[9px] font-bold px-1.5 py-0.2 rounded-md">${idx + 1}ª</span>
+            <button type="button" onclick="removerFotoModal(${idx})" class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-rose-600 text-white rounded-full flex items-center justify-center text-[10px] shadow cursor-pointer hover:bg-rose-700" title="Remover foto">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         `;
@@ -807,6 +1053,24 @@ function renderFotosModal(fotos) {
         `;
         container.appendChild(addBtn);
     }
+}
+
+function adicionarFotoPorUrl() {
+    const input = document.getElementById('modal-foto-url-input');
+    if (!input) return;
+    const url = input.value.trim();
+    if (!url) {
+        showToast('Cole a URL da imagem primeiro!', 'warning');
+        return;
+    }
+    if (fotosTemp.length >= 4) {
+        showToast('Limite máximo de 4 fotos atingido!', 'warning');
+        return;
+    }
+    fotosTemp.push(url);
+    input.value = '';
+    renderFotosModal(fotosTemp);
+    showToast(`Foto adicionada com sucesso! (${fotosTemp.length}/4) 📸`, 'success');
 }
 
 function removerFotoModal(idx) {
@@ -836,7 +1100,7 @@ function handleFotoUpload(event) {
                 done++;
                 if (done === paraProcessar.length) {
                     renderFotosModal(fotosTemp);
-                    showToast(`${done} foto(s) adicionada(s)! 📸`, 'success');
+                    showToast(`${done} foto(s) adicionada(s)! (${fotosTemp.length}/4) 📸`, 'success');
                 }
             };
             img.src = ev.target.result;
@@ -2341,20 +2605,737 @@ function renderRankingDoces() {
 }
 
 // ==========================================
+// MÓDULO: ESTEIRA DE PEDIDOS & COZINHA (KDS)
+// ==========================================
+
+let somPedidosAtivo = localStorage.getItem('ds_som_pedidos') !== 'false';
+let totalPedidosAnterior = -1;
+
+function toggleSomPedidos() {
+    somPedidosAtivo = !somPedidosAtivo;
+    localStorage.setItem('ds_som_pedidos', somPedidosAtivo ? 'true' : 'false');
+    atualizarBotaoSomPedidos();
+    if (somPedidosAtivo) {
+        tocarSomNovoPedido();
+        showToast('Alerta sonoro de novos pedidos ATIVADO!', 'success');
+    } else {
+        showToast('Alerta sonoro DESATIVADO.', 'info');
+    }
+}
+
+function atualizarBotaoSomPedidos() {
+    const icon = document.getElementById('som-pedidos-icon');
+    const label = document.getElementById('som-pedidos-label');
+    const btn = document.getElementById('btn-toggle-som-pedidos');
+    if (!icon || !label || !btn) return;
+
+    if (somPedidosAtivo) {
+        icon.className = 'fa-solid fa-bell text-amber-500';
+        label.textContent = 'Alerta Sonoro: Ativado';
+        btn.classList.remove('opacity-60');
+    } else {
+        icon.className = 'fa-solid fa-bell-slash text-slate-400';
+        label.textContent = 'Alerta Sonoro: Mudo';
+        btn.classList.add('opacity-60');
+    }
+}
+
+// Alerta Sonoro usando Web Audio API (compatível sem dependência externa de arquivos mp3)
+function tocarSomNovoPedido() {
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        if (ctx.state === 'suspended') {
+            ctx.resume();
+        }
+
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'triangle';
+        // Melodia de campainha doce (Mi -> Sol# -> Si)
+        osc.frequency.setValueAtTime(659.25, now);        // E5
+        osc.frequency.setValueAtTime(830.61, now + 0.12); // G#5
+        osc.frequency.setValueAtTime(987.77, now + 0.24); // B5
+
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.7);
+    } catch (e) {
+        console.warn('Não foi possível tocar áudio de alerta:', e);
+    }
+}
+
+function renderPedidosKDS() {
+    const colPendente = document.getElementById('kds-col-pendente');
+    const colProducao = document.getElementById('kds-col-producao');
+    const colEntrega = document.getElementById('kds-col-entrega');
+    const colConcluido = document.getElementById('kds-col-concluido');
+
+    if (!colPendente || !colProducao || !colEntrega || !colConcluido) return;
+
+    atualizarBotaoSomPedidos();
+
+    // Categorizar vendas por status
+    const pendentes = [];
+    const producao = [];
+    const entrega = [];
+    const concluidos = [];
+
+    // Pegar pedidos de hoje ou ativos
+    (vendas || []).forEach(v => {
+        const st = (v.status || 'Pendente').toLowerCase();
+        if (st.includes('pendente') || st.includes('novo') || st.includes('aguardando')) {
+            pendentes.push(v);
+        } else if (st.includes('produ') || st.includes('preparo') || st.includes('cozinha')) {
+            producao.push(v);
+        } else if (st.includes('entrega') || st.includes('saiu')) {
+            entrega.push(v);
+        } else {
+            concluidos.push(v);
+        }
+    });
+
+    // Detectar se entrou pedido novo e tocar som
+    const totalEmAberto = pendentes.length + producao.length + entrega.length;
+    if (totalPedidosAnterior !== -1 && pendentes.length > totalPedidosAnterior && somPedidosAtivo) {
+        tocarSomNovoPedido();
+        showToast('🔔 Novo Pedido Recebido na Esteira!', 'info');
+    }
+    totalPedidosAnterior = pendentes.length;
+
+    // Atualizar badges
+    const totalAbertoEl = document.getElementById('kds-total-badge');
+    if (totalAbertoEl) totalAbertoEl.textContent = `${totalEmAberto} em aberto`;
+
+    const bPendente = document.getElementById('badge-col-pendente');
+    if (bPendente) bPendente.textContent = pendentes.length;
+
+    const bProducao = document.getElementById('badge-col-producao');
+    if (bProducao) bProducao.textContent = producao.length;
+
+    const bEntrega = document.getElementById('badge-col-entrega');
+    if (bEntrega) bEntrega.textContent = entrega.length;
+
+    const bConcluido = document.getElementById('badge-col-concluido');
+    if (bConcluido) bConcluido.textContent = concluidos.length;
+
+    const bSidebar = document.getElementById('badge-pedidos-pendentes');
+    if (bSidebar) {
+        bSidebar.textContent = pendentes.length;
+        bSidebar.className = pendentes.length > 0 
+            ? 'text-[10px] bg-rose-500 text-white px-2 py-0.5 rounded-full font-black animate-pulse' 
+            : 'text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-bold';
+    }
+
+    const bMobile = document.getElementById('bottom-nav-pedidos-badge');
+    if (bMobile) {
+        bMobile.textContent = pendentes.length;
+        bMobile.classList.toggle('hidden', pendentes.length === 0);
+    }
+
+    // Renderizar colunas
+    colPendente.innerHTML = pendentes.length === 0
+        ? `<div class="p-6 text-center text-slate-400 text-xs italic">Nenhum pedido novo aguardando.</div>`
+        : pendentes.map(p => criarCardKDS(p, 'pendente')).join('');
+
+    colProducao.innerHTML = producao.length === 0
+        ? `<div class="p-6 text-center text-slate-400 text-xs italic">Nenhum pedido em produção no momento.</div>`
+        : producao.map(p => criarCardKDS(p, 'producao')).join('');
+
+    colEntrega.innerHTML = entrega.length === 0
+        ? `<div class="p-6 text-center text-slate-400 text-xs italic">Nenhum pedido em rota de entrega.</div>`
+        : entrega.map(p => criarCardKDS(p, 'entrega')).join('');
+
+    colConcluido.innerHTML = concluidos.length === 0
+        ? `<div class="p-6 text-center text-slate-400 text-xs italic">Nenhum pedido concluído recentemente.</div>`
+        : concluidos.slice(0, 10).map(p => criarCardKDS(p, 'concluido')).join('');
+}
+
+function criarCardKDS(pedido, coluna) {
+    const itensHtml = (pedido.itens || []).map(i => `
+        <div class="flex justify-between text-xs py-0.5">
+            <span class="font-bold text-[#2e171e]">${i.qtd}x ${i.nome}</span>
+            <span class="text-slate-500">${formatMoney((i.preco || 0) * i.qtd)}</span>
+        </div>
+        ${i.obs ? `<p class="text-[10px] text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded italic">Obs: "${i.obs}"</p>` : ''}
+    `).join('');
+
+    const canalBadge = {
+        'pede-ai': '<span class="bg-[#fde8ed] text-[#ab4e5e] px-2 py-0.5 rounded-md font-bold text-[10px]">FOMEK Delivery</span>',
+        'balcao': '<span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md font-bold text-[10px]">Balcão</span>',
+        'whatsapp': '<span class="bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded-md font-bold text-[10px]">WhatsApp</span>',
+        'ifood': '<span class="bg-rose-50 text-rose-800 px-2 py-0.5 rounded-md font-bold text-[10px]">iFood</span>'
+    }[pedido.canal] || '<span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md font-bold text-[10px]">Pedido</span>';
+
+    // Status de pagamento
+    let pagtoBadge = '';
+    const formaPag = (pedido.formaPagamento || '').toLowerCase();
+    if (formaPag.includes('pix')) {
+        const estaPago = pedido.status === 'Pago' || coluna === 'producao' || coluna === 'entrega' || coluna === 'concluido';
+        if (estaPago) {
+            pagtoBadge = '<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md font-bold text-[10px] flex items-center gap-1"><i class="fa-brands fa-pix text-emerald-600"></i> Pix Pago</span>';
+        } else {
+            pagtoBadge = `<button onclick="verificarPagamentoAsaasKDS(${pedido.id})" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-2 py-0.5 rounded-md font-bold text-[10px] flex items-center gap-1 cursor-pointer transition-colors" title="Clique para consultar status no Asaas"><i class="fa-brands fa-pix text-amber-600"></i> Pix Pendente (Verificar)</button>`;
+        }
+    } else if (formaPag.includes('dinheiro')) {
+        pagtoBadge = `<span class="bg-emerald-50 text-emerald-900 px-2 py-0.5 rounded-md font-bold text-[10px]">💵 Dinheiro</span>`;
+    } else {
+        pagtoBadge = `<span class="bg-blue-50 text-blue-900 px-2 py-0.5 rounded-md font-bold text-[10px]">💳 ${pedido.formaPagamento || 'Cartão'}</span>`;
+    }
+
+    // Botões de avanço de status
+    let btnTransicao = '';
+    if (coluna === 'pendente') {
+        btnTransicao = `
+            <button onclick="avancarStatusPedido(${pedido.id})" class="flex-1 py-1.5 bg-[#ab4e5e] hover:bg-[#96404f] text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer">
+                <i class="fa-solid fa-kitchen-set"></i>
+                <span>Enviar p/ Cozinha</span>
+            </button>
+        `;
+    } else if (coluna === 'producao') {
+        btnTransicao = `
+            <button onclick="avancarStatusPedido(${pedido.id})" class="flex-1 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer">
+                <i class="fa-solid fa-motorcycle"></i>
+                <span>Despachar (Entrega)</span>
+            </button>
+        `;
+    } else if (coluna === 'entrega') {
+        btnTransicao = `
+            <button onclick="avancarStatusPedido(${pedido.id})" class="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer">
+                <i class="fa-solid fa-check"></i>
+                <span>Marcar Entregue</span>
+            </button>
+        `;
+    }
+
+    const telLimpo = (pedido.telefone || '').replace(/\D/g, '');
+    const whatsLink = telLimpo ? `https://api.whatsapp.com/send?phone=${telLimpo.startsWith('55') ? telLimpo : '55' + telLimpo}` : '';
+
+    return `
+        <div class="bg-white rounded-2xl p-3.5 border border-[#faedf0] shadow-2xs space-y-2.5 transition-all hover:border-[#f0c9d0]">
+            <!-- Header do Card -->
+            <div class="flex items-center justify-between gap-2 border-b border-[#faedf0] pb-2">
+                <div class="flex items-center gap-1.5">
+                    <span class="font-mono font-black text-xs text-[#2e171e]">#${String(pedido.id).slice(-4)}</span>
+                    ${canalBadge}
+                </div>
+                <span class="text-[10px] text-slate-400">${pedido.data || ''}</span>
+            </div>
+
+            <!-- Cliente & Contato -->
+            <div>
+                <div class="flex items-center justify-between">
+                    <p class="font-extrabold text-xs text-[#2e171e] truncate" title="${pedido.cliente}">${pedido.cliente}</p>
+                    ${whatsLink ? `
+                        <a href="${whatsLink}" target="_blank" class="text-emerald-600 hover:text-emerald-700 text-xs px-1.5 py-0.5 rounded bg-emerald-50 font-bold flex items-center gap-1" title="Abrir conversa no WhatsApp">
+                            <i class="fa-brands fa-whatsapp"></i>
+                            <span class="text-[10px]">Whats</span>
+                        </a>
+                    ` : ''}
+                </div>
+                ${pedido.endereco ? `
+                    <p class="text-[11px] text-slate-500 mt-0.5 leading-snug line-clamp-2" title="${pedido.endereco}">
+                        <i class="fa-solid fa-location-dot text-[#c58a80] mr-1"></i>${pedido.endereco}
+                    </p>
+                ` : ''}
+            </div>
+
+            <!-- Pagamento -->
+            <div class="flex items-center justify-between pt-1 border-t border-dashed border-[#faedf0]">
+                ${pagtoBadge}
+                <span class="font-black text-xs text-[#ab4e5e]">${formatMoney(pedido.totalBruto)}</span>
+            </div>
+
+            <!-- Lista de Itens -->
+            <div class="bg-[#fff8f9] rounded-xl p-2 space-y-1 border border-[#faedf0] max-h-36 overflow-y-auto">
+                ${itensHtml}
+            </div>
+
+            <!-- Ações Rápidas -->
+            <div class="pt-1 flex items-center gap-1.5">
+                ${btnTransicao}
+                <button onclick="notificarClienteWhatsAppKDS(${pedido.id}, '${coluna}')" class="w-8 h-8 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 flex items-center justify-center transition-all cursor-pointer shadow-2xs" title="Enviar atualização de status para o cliente no WhatsApp">
+                    <i class="fa-brands fa-whatsapp text-sm"></i>
+                </button>
+                <button onclick="imprimirComandaKDS(${pedido.id})" class="w-8 h-8 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 flex items-center justify-center transition-all cursor-pointer shadow-2xs" title="Imprimir Comanda 58mm / 80mm">
+                    <i class="fa-solid fa-print text-xs"></i>
+                </button>
+                <button onclick="abrirModalComprovante(${pedido.id})" class="w-8 h-8 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 flex items-center justify-center transition-all cursor-pointer shadow-2xs" title="Ver Detalhes / Comprovante">
+                    <i class="fa-solid fa-receipt text-xs"></i>
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// Avançar status do pedido
+function avancarStatusPedido(pedidoId) {
+    const pedido = (vendas || []).find(v => v.id === pedidoId);
+    if (!pedido) return;
+
+    const st = (pedido.status || 'Pendente').toLowerCase();
+    if (st.includes('pendente') || st.includes('novo')) {
+        pedido.status = 'Em Produção';
+        abaterEstoqueInsumos(pedido);
+        showToast(`Pedido #${String(pedido.id).slice(-4)} enviado para a cozinha! 🍓`, 'success');
+    } else if (st.includes('produ') || st.includes('preparo')) {
+        pedido.status = 'Saiu para Entrega';
+        showToast(`Pedido #${String(pedido.id).slice(-4)} despachado para entrega! 🛵`, 'info');
+    } else if (st.includes('entrega') || st.includes('saiu')) {
+        pedido.status = 'Concluído';
+        showToast(`Pedido #${String(pedido.id).slice(-4)} finalizado com sucesso! 🎉`, 'success');
+    }
+
+    saveData();
+    renderPedidosKDS();
+    renderHistorico();
+}
+
+// Consultar pagamento no Asaas pelo KDS
+async function verificarPagamentoAsaasKDS(pedidoId) {
+    const pedido = (vendas || []).find(v => v.id === pedidoId);
+    if (!pedido) return;
+
+    if (!pedido.pixDados || !pedido.pixDados.paymentId || pedido.pixDados.paymentId.startsWith('PIX_')) {
+        if (confirm(`Confirmar recebimento do PIX de ${formatMoney(pedido.totalBruto)} manualmente?`)) {
+            pedido.status = 'Pago';
+            saveData();
+            renderPedidosKDS();
+            renderHistorico();
+            showToast('Pagamento confirmado manualmente!', 'success');
+        }
+        return;
+    }
+
+    showToast('Consultando Asaas...', 'info');
+    if (typeof AsaasPagamento !== 'undefined') {
+        const res = await AsaasPagamento.consultarStatus(pedido.pixDados.paymentId);
+        if (res && res.pago) {
+            pedido.status = 'Pago';
+            saveData();
+            renderPedidosKDS();
+            renderHistorico();
+            showToast('Pagamento confirmado pelo Asaas! 🟢', 'success');
+        } else {
+            showToast('Cobrança ainda pendente no Asaas.', 'warning');
+        }
+    }
+}
+
+// Notificar cliente no WhatsApp com mensagem de status
+function notificarClienteWhatsAppKDS(pedidoId, statusAtual) {
+    const pedido = (vendas || []).find(v => v.id === pedidoId);
+    if (!pedido) return;
+
+    const nomeLoja = DADOS_LOJA_ATUAL.nome || 'nossa loja';
+    const nome = (pedido.cliente || 'Cliente').split(' ')[0];
+    const cod = String(pedido.id).slice(-4);
+    const originUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+    const linkAcompanhar = `${originUrl}pedido.html?id=${pedido.id}`;
+
+    let texto = '';
+    if (statusAtual === 'pendente') {
+        texto = `Olá *${nome}*! 👋 Recebemos o seu pedido *#${cod}* em *${nomeLoja}* e já estamos conferindo. Você pode acompanhar o status aqui: ${linkAcompanhar}`;
+    } else if (statusAtual === 'producao') {
+        texto = `Olá *${nome}*! 👨‍🍳 Seus itens do pedido *#${cod}* já estão em produção na nossa cozinha com todo carinho! Acompanhe em tempo real: ${linkAcompanhar}`;
+    } else if (statusAtual === 'entrega') {
+        texto = `Olá *${nome}*! 🛵 Seu pedido *#${cod}* acabou de sair para entrega com o nosso motoboy! Fique atento(a). Acompanhe aqui: ${linkAcompanhar}`;
+    } else {
+        texto = `Olá *${nome}*! 🎉 Seu pedido *#${cod}* foi concluído e entregue. Muito obrigado por escolher *${nomeLoja}*! Tenha uma excelente experiência! ✨`;
+    }
+
+    const telLimpo = (pedido.telefone || '').replace(/\D/g, '');
+    const whatsUrl = telLimpo
+        ? `https://api.whatsapp.com/send?phone=${telLimpo.startsWith('55') ? telLimpo : '55' + telLimpo}&text=${encodeURIComponent(texto)}`
+        : `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
+
+    window.open(whatsUrl, '_blank');
+}
+
+// Impressão Térmica de Comanda (58mm e 80mm)
+function imprimirComandaKDS(pedidoId) {
+    const pedido = (vendas || []).find(v => v.id === pedidoId);
+    if (!pedido) return;
+
+    const printArea = document.getElementById('print-cupom-area');
+    if (!printArea) return;
+
+    const nomeLojaImpressao = (DADOS_LOJA_ATUAL.nome || 'FOMEK DELIVERY').toUpperCase();
+
+    const itensComanda = (pedido.itens || []).map(i => `
+        <div style="display:flex; justify-content:space-between; margin:4px 0; font-size:13px; font-weight:bold;">
+            <span>${i.qtd}x ${i.nome}</span>
+            <span>${formatMoney((i.preco || 0) * i.qtd)}</span>
+        </div>
+        ${i.obs ? `<div style="font-size:11px; font-style:italic; margin-bottom:4px;">* OBS: ${i.obs}</div>` : ''}
+    `).join('');
+
+    printArea.innerHTML = `
+        <div style="font-family: monospace; width: 100%; max-width: 80mm; margin: 0 auto; line-height: 1.3;">
+            <div style="text-align: center; border-bottom: 1px dashed black; padding-bottom: 6px; margin-bottom: 6px;">
+                <h2 style="font-size: 16px; margin: 0; font-weight: 900;">${nomeLojaImpressao}</h2>
+                <p style="font-size: 11px; margin: 2px 0;">FOMEK DELIVERY</p>
+                <p style="font-size: 14px; margin: 4px 0; font-weight: 900;">PEDIDO #${String(pedido.id).slice(-4)}</p>
+                <p style="font-size: 10px; margin: 0;">${pedido.data}</p>
+            </div>
+
+            <div style="border-bottom: 1px dashed black; padding-bottom: 6px; margin-bottom: 6px; font-size: 11px;">
+                <div><strong>CLIENTE:</strong> ${pedido.cliente}</div>
+                ${pedido.telefone ? `<div><strong>WHATSAPP:</strong> ${pedido.telefone}</div>` : ''}
+                ${pedido.endereco ? `<div style="margin-top:4px;"><strong>ENDEREÇO:</strong><br>${pedido.endereco}</div>` : ''}
+                <div style="margin-top:2px;"><strong>PAGAMENTO:</strong> ${pedido.formaPagamento || 'Pix'}</div>
+            </div>
+
+            <div style="border-bottom: 1px dashed black; padding-bottom: 6px; margin-bottom: 6px;">
+                <div style="font-size: 11px; font-weight: bold; margin-bottom: 4px;">ITENS DE PRODUÇÃO:</div>
+                ${itensComanda}
+            </div>
+
+            <div style="font-size: 12px; font-weight: bold; margin-bottom: 8px;">
+                <div style="display:flex; justify-content:space-between;">
+                    <span>SUBTOTAL:</span>
+                    <span>${formatMoney(pedido.subtotal || pedido.totalBruto)}</span>
+                </div>
+                ${pedido.taxaOuFrete > 0 ? `
+                    <div style="display:flex; justify-content:space-between;">
+                        <span>TAXA ENTREGA:</span>
+                        <span>+ ${formatMoney(pedido.taxaOuFrete)}</span>
+                    </div>
+                ` : ''}
+                <div style="display:flex; justify-content:space-between; font-size:15px; margin-top:4px; border-top:1px solid black; padding-top:4px;">
+                    <span>TOTAL:</span>
+                    <span>${formatMoney(pedido.totalBruto)}</span>
+                </div>
+            </div>
+
+            <div style="text-align: center; font-size: 10px; border-top: 1px dashed black; padding-top: 6px;">
+                <p style="margin: 0;">Feito com dedicação e carinho!</p>
+            </div>
+        </div>
+    `;
+
+    window.print();
+}
+
+// Abater estoque de insumos automaticamente (compatibilidade)
+function abaterEstoqueInsumos(pedido) {
+    if (!pedido || !pedido.itens || !insumos || insumos.length === 0) return;
+
+    let alterou = false;
+    pedido.itens.forEach(item => {
+        const insumoCorrespondente = insumos.find(ins => 
+            item.nome.toLowerCase().includes(ins.nome.toLowerCase()) ||
+            ins.nome.toLowerCase().includes(item.nome.toLowerCase())
+        );
+
+        if (insumoCorrespondente && insumoCorrespondente.qtd > 0) {
+            insumoCorrespondente.qtd = Math.max(0, insumoCorrespondente.qtd - item.qtd);
+            alterou = true;
+        }
+    });
+
+    if (alterou) {
+        saveData();
+        if (typeof renderInsumos === 'function') renderInsumos();
+    }
+}
+
+// Loop de atualização periódica dos pedidos em segundo plano
+setInterval(() => {
+    try {
+        const vendasSalvas = JSON.parse(localStorage.getItem('ds_vendas') || '[]');
+        const vendasDaLoja = ID_LOJA_ATUAL === 'dasilva-doceria'
+            ? vendasSalvas.filter(v => !v.lojaId || v.lojaId === 'dasilva-doceria')
+            : vendasSalvas.filter(v => v.lojaId === ID_LOJA_ATUAL);
+
+        if (vendasDaLoja.length !== vendas.length) {
+            vendas = vendasDaLoja;
+            renderPedidosKDS();
+            renderHistorico();
+        }
+    } catch(e) {}
+}, 5000);
+
+// ==========================================
+// IDENTIDADE VISUAL MULTI-LOJA & PERSONALIZAÇÃO DE LAYOUT
+// ==========================================
+
+function aplicarIdentidadeVisualLoja() {
+    const loja = DADOS_LOJA_ATUAL;
+    const nomeLoja = loja.nome || 'Loja Parceira';
+    const catLoja = (loja.categoriaPrincipal || 'DELIVERY').toUpperCase();
+    const logoSrc = loja.logo || 'img/fomek_logo.png';
+
+    // 1. Título do Documento e Favicon
+    document.title = `${nomeLoja} • Painel do Gestor FOMEK`;
+    const fav = document.getElementById('gestor-favicon');
+    if (fav) fav.href = 'img/fomek_favicon.png';
+    const appleFav = document.getElementById('gestor-apple-icon');
+    if (appleFav) appleFav.href = 'img/fomek_favicon.png';
+
+    // 2. Sidebar Desktop
+    const sbLogo = document.getElementById('sidebar-store-logo');
+    if (sbLogo) sbLogo.src = logoSrc;
+    const sbName = document.getElementById('sidebar-store-name');
+    if (sbName) sbName.textContent = nomeLoja;
+    const sbCat = document.getElementById('sidebar-store-category');
+    if (sbCat) sbCat.innerHTML = `<span>• ${catLoja} •</span>`;
+
+    // 3. Header Mobile
+    const mbLogo = document.getElementById('mobile-store-logo');
+    if (mbLogo) mbLogo.src = logoSrc;
+    const mbName = document.getElementById('mobile-store-name');
+    if (mbName) mbName.textContent = nomeLoja;
+    const mbCat = document.getElementById('mobile-store-category');
+    if (mbCat) mbCat.textContent = `• ${catLoja} •`;
+
+    // 4. Header Desktop
+    const dtLogo = document.getElementById('desktop-store-logo');
+    if (dtLogo) dtLogo.src = logoSrc;
+    const dtName = document.getElementById('desktop-store-name');
+    if (dtName) dtName.textContent = nomeLoja;
+    const dtCat = document.getElementById('desktop-store-category');
+    if (dtCat) dtCat.textContent = catLoja;
+
+    // 5. Botão "Ver no App"
+    const btnApp = document.getElementById('btn-ver-app-header');
+    if (btnApp) {
+        btnApp.href = `index.html?loja=${ID_LOJA_ATUAL}`;
+        btnApp.title = `Ver cardápio de ${nomeLoja} no app de clientes`;
+    }
+
+    // 6. Aplicar cores personalizadas se configuradas
+    if (loja.corPrimaria) {
+        document.documentElement.style.setProperty('--cor-primaria', loja.corPrimaria);
+    }
+    if (loja.corFundo) {
+        document.body.style.backgroundColor = loja.corFundo;
+    }
+
+    // 7. Preencher campos da aba Layout se existirem
+    preencherCamposAbaLayout();
+
+    // 8. Adaptações de texto caso não seja a doceria
+    if (ID_LOJA_ATUAL !== 'dasilva-doceria') {
+        const headerTitle = document.getElementById('header-title');
+        if (headerTitle && headerTitle.textContent.includes('Doces')) {
+            headerTitle.textContent = `Catálogo de Produtos - ${nomeLoja}`;
+        }
+        const headerDesc = document.getElementById('header-desc');
+        if (headerDesc && headerDesc.textContent.includes('sobremesas')) {
+            headerDesc.textContent = `Cardápio completo de ${nomeLoja} com pesquisa rápida e edição`;
+        }
+
+        const catalogoTituloTexto = document.getElementById('catalogo-titulo-texto');
+        if (catalogoTituloTexto) {
+            catalogoTituloTexto.innerHTML = `Catálogo de ${nomeLoja}`;
+        }
+
+        const navCatSpan = document.querySelector('#nav-catalogo span.font-bold');
+        if (navCatSpan) navCatSpan.textContent = 'Catálogo de Produtos';
+
+        const btnRestore = document.querySelector('button[onclick="restaurarCardapioPadrao()"]');
+        if (btnRestore) {
+            btnRestore.innerHTML = `<i class="fa-solid fa-rotate text-[#c58a80]"></i><span>Restaurar Padrão</span>`;
+            btnRestore.title = `Restaurar cardápio padrão desta loja`;
+        }
+
+        const btnNovoDoce = document.querySelector('button[onclick="abrirModalNovoDoce()"] span');
+        if (btnNovoDoce) {
+            btnNovoDoce.textContent = 'Novo Produto';
+        }
+
+        const modalDoceTitulo = document.getElementById('modal-doce-titulo');
+        if (modalDoceTitulo) {
+            modalDoceTitulo.textContent = 'Cadastrar Novo Produto';
+        }
+    }
+}
+
+// Preencher campos da tela de personalização de layout
+function preencherCamposAbaLayout() {
+    const loja = DADOS_LOJA_ATUAL;
+    const inLogo = document.getElementById('cfg-layout-logo');
+    if (!inLogo) return;
+
+    inLogo.value = loja.logo || '';
+    const inCapa = document.getElementById('cfg-layout-capa');
+    if (inCapa) inCapa.value = loja.capa || '';
+    const inCat = document.getElementById('cfg-layout-categoria');
+    if (inCat) inCat.value = loja.categoriaPrincipal || '';
+    const inSlogan = document.getElementById('cfg-layout-slogan');
+    if (inSlogan) inSlogan.value = loja.destaque || loja.slogan || '';
+
+    const pLogo = document.getElementById('preview-layout-logo');
+    if (pLogo) pLogo.src = loja.logo || 'img/fomek_logo.png';
+    const pCapa = document.getElementById('preview-layout-capa');
+    if (pCapa) pCapa.src = loja.capa || 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=700&auto=format&fit=crop&q=80';
+
+    const corPri = loja.corPrimaria || '#ab4e5e';
+    const corSec = loja.corSecundaria || '#2e171e';
+    const corFun = loja.corFundo || '#fdf5f6';
+
+    const elPri = document.getElementById('cfg-cor-primaria');
+    const elPriHex = document.getElementById('cfg-cor-primaria-hex');
+    if (elPri) elPri.value = corPri;
+    if (elPriHex) elPriHex.value = corPri;
+
+    const elSec = document.getElementById('cfg-cor-secundaria');
+    const elSecHex = document.getElementById('cfg-cor-secundaria-hex');
+    if (elSec) elSec.value = corSec;
+    if (elSecHex) elSecHex.value = corSec;
+
+    const elFun = document.getElementById('cfg-cor-fundo');
+    const elFunHex = document.getElementById('cfg-cor-fundo-hex');
+    if (elFun) elFun.value = corFun;
+    if (elFunHex) elFunHex.value = corFun;
+
+    atualizarPreviewLayoutAoVivo();
+}
+
+function atualizarPreviewLayoutAoVivo() {
+    const logoVal = (document.getElementById('cfg-layout-logo')?.value || '').trim();
+    const capaVal = (document.getElementById('cfg-layout-capa')?.value || '').trim();
+    const corPri = document.getElementById('cfg-cor-primaria')?.value || '#ab4e5e';
+    const corSec = document.getElementById('cfg-cor-secundaria')?.value || '#2e171e';
+    const corFun = document.getElementById('cfg-cor-fundo')?.value || '#fdf5f6';
+
+    if (document.getElementById('cfg-cor-primaria-hex')) document.getElementById('cfg-cor-primaria-hex').value = corPri;
+    if (document.getElementById('cfg-cor-secundaria-hex')) document.getElementById('cfg-cor-secundaria-hex').value = corSec;
+    if (document.getElementById('cfg-cor-fundo-hex')) document.getElementById('cfg-cor-fundo-hex').value = corFun;
+
+    const pLogo = document.getElementById('preview-layout-logo');
+    if (pLogo && logoVal) pLogo.src = logoVal;
+    const pCapa = document.getElementById('preview-layout-capa');
+    if (pCapa && capaVal) pCapa.src = capaVal;
+
+    // Atualiza caixa demo
+    const dBox = document.getElementById('demo-preview-box');
+    const dBadge = document.getElementById('demo-preview-badge');
+    const dTitle = document.getElementById('demo-preview-title');
+    const dSub = document.getElementById('demo-preview-sub');
+    const dBtn = document.getElementById('demo-preview-btn');
+
+    if (dBox) dBox.style.backgroundColor = corFun;
+    if (dBadge) dBadge.style.backgroundColor = corPri;
+    if (dTitle) {
+        dTitle.style.color = corSec;
+        dTitle.textContent = DADOS_LOJA_ATUAL.nome || 'Sua Loja';
+    }
+    if (dSub) dSub.style.color = corPri;
+    if (dBtn) dBtn.style.backgroundColor = corPri;
+}
+
+function aplicarTemaPredefinido(primaria, secundaria, fundo) {
+    const elPri = document.getElementById('cfg-cor-primaria');
+    const elSec = document.getElementById('cfg-cor-secundaria');
+    const elFun = document.getElementById('cfg-cor-fundo');
+    if (elPri) elPri.value = primaria;
+    if (elSec) elSec.value = secundaria;
+    if (elFun) elFun.value = fundo;
+    atualizarPreviewLayoutAoVivo();
+    showToast('Tema selecionado! Clique em Salvar Layout para aplicar.', 'info');
+}
+
+function uploadImagemParaCampo(input, fieldId, previewId) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const base64 = e.target.result;
+        const targetInput = document.getElementById(fieldId);
+        if (targetInput) targetInput.value = base64;
+        const preview = document.getElementById(previewId);
+        if (preview) preview.src = base64;
+        atualizarPreviewLayoutAoVivo();
+        showToast('Imagem carregada! Clique em Salvar Layout.', 'success');
+    };
+    reader.readAsDataURL(file);
+}
+
+function salvarPersonalizacaoLayout() {
+    const logoVal = (document.getElementById('cfg-layout-logo')?.value || '').trim();
+    const capaVal = (document.getElementById('cfg-layout-capa')?.value || '').trim();
+    const catVal = (document.getElementById('cfg-layout-categoria')?.value || '').trim();
+    const sloganVal = (document.getElementById('cfg-layout-slogan')?.value || '').trim();
+    const corPri = document.getElementById('cfg-cor-primaria')?.value || '#ab4e5e';
+    const corSec = document.getElementById('cfg-cor-secundaria')?.value || '#2e171e';
+    const corFun = document.getElementById('cfg-cor-fundo')?.value || '#fdf5f6';
+
+    const layoutObj = {
+        logo: logoVal || DADOS_LOJA_ATUAL.logo || 'img/fomek_logo.png',
+        capa: capaVal || DADOS_LOJA_ATUAL.capa || '',
+        categoriaPrincipal: catVal || DADOS_LOJA_ATUAL.categoriaPrincipal || 'Restaurante',
+        destaque: sloganVal || DADOS_LOJA_ATUAL.destaque || '',
+        corPrimaria: corPri,
+        corSecundaria: corSec,
+        corFundo: corFun
+    };
+
+    // 1. Salvar no namespace específico desta loja
+    localStorage.setItem(`ds_layout_${ID_LOJA_ATUAL}`, JSON.stringify(layoutObj));
+
+    // 2. Atualizar objeto em memória
+    Object.assign(DADOS_LOJA_ATUAL, layoutObj);
+
+    // 3. Sincronizar com fomek_lojas_master para que o index.html (App FOMEK) reflita instantaneamente
+    try {
+        let master = JSON.parse(localStorage.getItem('fomek_lojas_master') || '[]');
+        if (Array.isArray(master) && master.length > 0) {
+            const idx = master.findIndex(l => (l.id || '').toLowerCase() === ID_LOJA_ATUAL);
+            if (idx >= 0) {
+                master[idx].logo = layoutObj.logo;
+                master[idx].capa = layoutObj.capa;
+                master[idx].categoriaPrincipal = layoutObj.categoriaPrincipal;
+                master[idx].destaque = layoutObj.destaque;
+                master[idx].corPrimaria = layoutObj.corPrimaria;
+                master[idx].corSecundaria = layoutObj.corSecundaria;
+                master[idx].corFundo = layoutObj.corFundo;
+                localStorage.setItem('fomek_lojas_master', JSON.stringify(master));
+            }
+        }
+    } catch(e) {}
+
+    // 4. Reaplicar no gestor
+    aplicarIdentidadeVisualLoja();
+    showToast('🎉 Layout, imagens e cores salvas e publicadas no FOMEK!', 'success');
+
+    // 5. Nuvem
+    if (typeof CloudSync !== 'undefined' && CloudSync.pushToCloud) {
+        CloudSync.pushToCloud('layout-loja');
+    }
+}
+
+function restaurarLayoutPadrao() {
+    if (!confirm('Deseja restaurar as cores e imagens originais desta loja?')) return;
+    localStorage.removeItem(`ds_layout_${ID_LOJA_ATUAL}`);
+    window.location.reload();
+}
+
+// ==========================================
 // INICIALIZAÇÃO
 // ==========================================
 
 function renderAll() {
+    aplicarIdentidadeVisualLoja();
     renderCategorias();
     renderCatalogoDoces();
     renderPdvCatalogo();
     renderPdvItens();
-    renderInsumos();
     renderFaixasKM();
     renderTabelasFreteAdmin();
     renderContas();
     renderHistorico();
     renderDashboard();
+    renderPedidosKDS();
 }
 
 window.addEventListener('DOMContentLoaded', () => {

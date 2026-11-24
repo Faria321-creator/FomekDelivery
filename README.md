@@ -112,16 +112,57 @@ Todos os itens das fotos da doceria estão pré-cadastrados com descrições, pr
 ```text
 Da silva doceria/
 ├── index.html                   # Página principal com o catálogo e todas as telas
-├── sistema_de_gest_o_da_silva_doceria.html # Redirecionamento automático para index.html
 ├── img/
 │   └── logo.png                 # Logotipo oficial em alta resolução
 ├── css/
 │   └── style.css                # Paleta oficial (rosa, rose gold, chocolate) e modais
+├── api/
+│   └── asaas.js                 # Handler Serverless (Vercel & Node.js) para PIX Dinâmico e Webhooks
 ├── js/
 │   ├── data.js                  # 38 doces oficiais, insumos padrão, faixas KM e contas
-│   └── app.js                   # Toda a lógica da aplicação, catálogo, modais e duplicação
-└── README.md                    # Documentação do projeto e guia para o GitHub Pages
+│   ├── frete.js                 # Cálculo de rotas e frete por GPS/KM e bairros de Lorena-SP
+│   ├── asaas.js                 # Módulo de integração Asaas, Pix Dinâmico, QR Code e Polling
+│   ├── cloud.js                 # Módulo de sincronia em nuvem e snapshots
+│   └── app.js                   # Toda a lógica da aplicação, KDS, catálogo e duplicação
+├── pedido.html                  # Tela de Acompanhamento do Cliente em Tempo Real com QR Code Pix
+├── server.js                    # Servidor local Node.js opcional com zero dependências
+├── vercel.json                  # Configuração para deploy instantâneo na Vercel
+└── README.md                    # Documentação do projeto e guia para o GitHub Pages e Vercel
 ```
+
+---
+
+## 💳 Como Configurar o Asaas (Pagamento Pix Dinâmico Automático)
+
+1. **Obter a Chave no Asaas:**
+   - Acesse sua conta no [Asaas](https://www.asaas.com/) (ou no [Sandbox Asaas](https://sandbox.asaas.com/) para testes).
+   - Vá em **Configurações da Conta** > **Integrações** > **Gerar Chave de API** (Token).
+2. **Ativar no Painel do Gestor:**
+   - Abra o `gestor.html`, clique em **Configurações da Loja**.
+   - Na seção **Integração de Pagamentos Asaas & PIX**, cole o seu Token, selecione o ambiente (*Produção* ou *Sandbox*) e informe sua chave Pix de fallback.
+   - Clique em **Salvar e Publicar**.
+3. **Deploy com Vercel (Conectado ao seu GitHub):**
+   - Para que a API do Asaas funcione na nuvem sem precisar manter um servidor ligado, basta importar este repositório do GitHub na [Vercel](https://vercel.com/) (gratuito).
+   - O arquivo `vercel.json` e a pasta `api/asaas.js` já estão pré-configurados!
+4. **Execução Local (Opcional):**
+   - Caso queira testar localmente no seu computador com a API ativa, execute:
+     ```bash
+     node server.js
+     ```
+   - Acesse: `http://localhost:3000`
+
+---
+
+## 🛵 Esteira de Pedidos & Cozinha (KDS)
+
+No `gestor.html`, acesse a aba **"Pedidos & Cozinha"** para acompanhar todos os pedidos:
+- **1. Novos / Aguardando:** Pedidos feitos pela web com identificação de Pix Pago ou Pendente.
+- **2. Na Cozinha / Produção:** Pedidos em preparo (com baixa automática de insumos).
+- **3. Saiu p/ Entrega:** Despachado com motoboy (com link direto de rota no Google Maps).
+- **4. Concluídos / Entregues:** Pedidos finalizados.
+- **Alerta Sonoro:** Notificação com som de campainha em tempo real toda vez que um novo pedido chegar!
+- **Notificação WhatsApp com 1 Clique:** Envie avisos automáticos de status para o cliente no WhatsApp.
+- **Impressão Térmica:** Imprima comandas no padrão de 58mm ou 80mm para a cozinha e motoboy.
 
 ---
 
@@ -136,7 +177,6 @@ Da silva doceria/
    - pasta `img/` (com `logo.png`)
    - pasta `css/` (com `style.css`)
    - pasta `js/` (com `data.js` e `app.js`)
-   - `sistema_de_gest_o_da_silva_doceria.html`
    - `README.md`
 4. Clique em **Commit changes**.
 5. Vá em **Settings** > **Pages** > Na branch selecione **main** e pasta `/(root)`.
